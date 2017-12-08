@@ -9,44 +9,63 @@ export SysFloat,
 end # SysFloats
 
 
-Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
-Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
-Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
+@inline Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
+@inline Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
+@inline Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
 
-Base.convert(::Type{SysFloat}, ::Type{UInt16}) = Float16
-Base.convert(::Type{SysFloat}, ::Type{UInt32}) = Float32
-Base.convert(::Type{SysFloat}, ::Type{UInt64}) = Float64
+@inline Base.convert(::Type{SysFloat}, ::Type{UInt16}) = Float16
+@inline Base.convert(::Type{SysFloat}, ::Type{UInt32}) = Float32
+@inline Base.convert(::Type{SysFloat}, ::Type{UInt64}) = Float64
 
-Base.convert(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
-Base.convert(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
-Base.convert(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
+@inline Base.convert(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
+@inline Base.convert(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
+@inline Base.convert(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
 
-Base.convert(::Type{SysFloat}, x::UInt16) = reinterpret(Float16, x)
-Base.convert(::Type{SysFloat}, x::UInt32) = reinterpret(Float32, x)
-Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
+@inline Base.convert(::Type{SysFloat}, x::UInt16) = reinterpret(Float16, x)
+@inline Base.convert(::Type{SysFloat}, x::UInt32) = reinterpret(Float32, x)
+@inline Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
 
-Base.convert(::Type{Signed}, ::Type{Float16}) = Int16
-Base.convert(::Type{Signed}, ::Type{Float32}) = Int32
-Base.convert(::Type{Signed}, ::Type{Float64}) = Int64
+@inline Base.convert(::Type{Signed}, ::Type{Float16}) = Int16
+@inline Base.convert(::Type{Signed}, ::Type{Float32}) = Int32
+@inline Base.convert(::Type{Signed}, ::Type{Float64}) = Int64
 
-Base.convert(::Type{SysFloat}, ::Type{Int16}) = Float16
-Base.convert(::Type{SysFloat}, ::Type{Int32}) = Float32
-Base.convert(::Type{SysFloat}, ::Type{Int64}) = Float64
+@inline Base.convert(::Type{SysFloat}, ::Type{Int16}) = Float16
+@inline Base.convert(::Type{SysFloat}, ::Type{Int32}) = Float32
+@inline Base.convert(::Type{SysFloat}, ::Type{Int64}) = Float64
 
-Base.convert(::Type{Signed}, x::Float16) = reinterpret(Int16, x)
-Base.convert(::Type{Signed}, x::Float32) = reinterpret(Int32, x)
-Base.convert(::Type{Signed}, x::Float64) = reinterpret(Int64, x)
-​
-144
-# zero the field and yield other bit values, in place
-145
+@inline Base.convert(::Type{Signed}, x::Float16) = reinterpret(Int16, x)
+@inline Base.convert(::Type{Signed}, x::Float32) = reinterpret(Int32, x)
+@inline Base.convert(::Type{Signed}, x::Float64) = reinterpret(Int64, x)
 
-Base.convert(::Type{SysFloat}, x::Int16) = reinterpret(Float16, x)
-Base.convert(::Type{SysFloat}, x::Int32) = reinterpret(Float32, x)
-Base.convert(::Type{SysFloat}, x::Int64) = reinterpret(Float64, x)
+@inline Base.convert(::Type{SysFloat}, x::Int16) = reinterpret(Float16, x)
+@inline Base.convert(::Type{SysFloat}, x::Int32) = reinterpret(Float32, x)
+@inline Base.convert(::Type{SysFloat}, x::Int64) = reinterpret(Float64, x)
 
+
+export SysFloats, precision, significand_bits, exponent_bits,
+       exponent_max, exponent_min, exponent_bias, exponent_field_max,
 
 const SysFloats = Union{Float64, Float32, Float16}
+
+import Base.Math: precision, significand_bits, exponent_bits
+
+@inline exponent_max(::Type{Float16})  =     15
+@inline exponent_max(::Type{Float32})  =    127
+@inline exponent_max(::Type{Float64})  =   1023
+
+@inline exponent_min(::Type{T}) where T<:SysFloats = 1 - exponent_max(T)
+
+@inline exponent_bias(::Type{T}) where T<:SysFloats = exponent_max(T)
+
+@inline exponent_field_max(::Type{T}) where T<:SysFloats = exponent_max(T) + one(convert(Signed, T))
+
+
+
+# ~~~~~~~~~~~~~~~~
+
+@inline sign_field_offset(
+
+# ~~~~~~~~~~~~~~~~
 
 precision(::Type{Float16})  =  11
 precision(::Type{Float32})  =  24
@@ -68,11 +87,7 @@ exponent_min(::Type{Float16})  =     -14
 exponent_min(::Type{Float32})  =    -126
 exponent_min(::Type{Float64})  =   -1022
 
-exponent_bias(::Type{Float16})  =     15​
-144
-# zero the field and yield other bit values, in place
-145
-
+exponent_bias(::Type{Float16})  =     15
 exponent_bias(::Type{Float32})  =    127
 exponent_bias(::Type{Float64})  =   1023
 
@@ -86,10 +101,6 @@ exponent_field_max(::Type{Float64})  =   1024
 sign_field_offset(::Type{Float16}) = 15
 sign_field_offset(::Type{Float32}) = 31
 sign_field_offset(::Type{Float64}) = 63
-​
-144
-# zero the field and yield other bit values, in place
-145
 
 exponent_field_offset(::Type{Float16}) = 10
 exponent_field_offset(::Type{Float32}) = 23
