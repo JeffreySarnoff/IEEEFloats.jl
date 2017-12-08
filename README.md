@@ -1,5 +1,4 @@
-## IEEE754-2008
-### Standard conformant constants for Float64, Float32, Float16
+## IEEE754-2008 conformant constants for Float64, Float32, Float16
 
 ```julia
 const SysFloat = Union{Float16, Float32, Float64}
