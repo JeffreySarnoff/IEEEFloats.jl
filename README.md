@@ -38,6 +38,7 @@ exponent_field_max(::Type{T}) where T<:StdFloat = exponent_max(T) + 1
 
 ## all values
 
+```julia
 precision(::Type{Float16})  =  11
 precision(::Type{Float32})  =  24
 precision(::Type{Float64})  =  53
@@ -79,3 +80,4 @@ exponent_field_max(::Type{Float32})  =    128
 exponent_field_max(::Type{Float64})  =   1024
 exponent_field_max(::Type{Float128}) =  16384
 exponent_field_max(::Type{Float256}) = 262144
+```
