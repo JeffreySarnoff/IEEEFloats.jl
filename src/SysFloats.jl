@@ -1,0 +1,285 @@
+module SysFloats
+
+export SysFloat,
+       bitwidth, signbit, sign, precision, exponent, significand,
+       exponent_max, exponent_min, exponent_field_max,
+       
+
+
+end # SysFloats
+
+
+Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
+Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
+Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
+
+Base.convert(::Type{SysFloat}, ::Type{UInt16}) = Float16
+Base.convert(::Type{SysFloat}, ::Type{UInt32}) = Float32
+Base.convert(::Type{SysFloat}, ::Type{UInt64}) = Float64
+
+Base.convert(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
+Base.convert(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
+Base.convert(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
+
+Base.convert(::Type{SysFloat}, x::UInt16) = reinterpret(Float16, x)
+Base.convert(::Type{SysFloat}, x::UInt32) = reinterpret(Float32, x)
+Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
+
+Base.convert(::Type{Signed}, ::Type{Float16}) = Int16
+Base.convert(::Type{Signed}, ::Type{Float32}) = Int32
+Base.convert(::Type{Signed}, ::Type{Float64}) = Int64
+
+Base.convert(::Type{SysFloat}, ::Type{Int16}) = Float16
+Base.convert(::Type{SysFloat}, ::Type{Int32}) = Float32
+Base.convert(::Type{SysFloat}, ::Type{Int64}) = Float64
+
+Base.convert(::Type{Signed}, x::Float16) = reinterpret(Int16, x)
+Base.convert(::Type{Signed}, x::Float32) = reinterpret(Int32, x)
+Base.convert(::Type{Signed}, x::Float64) = reinterpret(Int64, x)
+​
+144
+# zero the field and yield other bit values, in place
+145
+
+Base.convert(::Type{SysFloat}, x::Int16) = reinterpret(Float16, x)
+Base.convert(::Type{SysFloat}, x::Int32) = reinterpret(Float32, x)
+Base.convert(::Type{SysFloat}, x::Int64) = reinterpret(Float64, x)
+
+
+const SysFloats = Union{Float64, Float32, Float16}
+
+precision(::Type{Float16})  =  11
+precision(::Type{Float32})  =  24
+precision(::Type{Float64})  =  53
+
+significand_bits(::Type{Float16})  =  10
+significand_bits(::Type{Float32})  =  23
+significand_bits(::Type{Float64})  =  52
+
+exponent_bits(::Type{Float16})  =  5
+exponent_bits(::Type{Float32})  =  8
+exponent_bits(::Type{Float64})  = 11
+
+exponent_max(::Type{Float16})  =     15
+exponent_max(::Type{Float32})  =    127
+exponent_max(::Type{Float64})  =   1023
+
+exponent_min(::Type{Float16})  =     -14
+exponent_min(::Type{Float32})  =    -126
+exponent_min(::Type{Float64})  =   -1022
+
+exponent_bias(::Type{Float16})  =     15​
+144
+# zero the field and yield other bit values, in place
+145
+
+exponent_bias(::Type{Float32})  =    127
+exponent_bias(::Type{Float64})  =   1023
+
+exponent_field_max(::Type{Float16})  =     16
+exponent_field_max(::Type{Float32})  =    128
+exponent_field_max(::Type{Float64})  =   1024
+
+# one way to mask the sign field
+# one(reinterpret(Unsigned, T)) << sign_field_offset(T)
+
+sign_field_offset(::Type{Float16}) = 15
+sign_field_offset(::Type{Float32}) = 31
+sign_field_offset(::Type{Float64}) = 63
+​
+144
+# zero the field and yield other bit values, in place
+145
+
+exponent_field_offset(::Type{Float16}) = 10
+exponent_field_offset(::Type{Float32}) = 23
+exponent_field_offset(::Type{Float64}) = 52
+
+significand_field_offset(::Type{Float16}) = 0
+significand_field_offset(::Type{Float32}) = 0
+significand_field_offset(::Type{Float64}) = 0
+
+
+
+sign_field_filter(::Type{Float16}) = ~zero(UInt16) >>> 1
+sign_field_filter(::Type{Float32}) = ~zero(UInt32) >>> 1
+sign_field_filter(::Type{Float64}) = ~zero(UInt64) >>> 1
+
+sign_field_mask(::Type{Float16}) = ~(~zero(UInt16) >>> 1)
+sign_field_mask(::Type{Float32}) = ~(~zero(UInt32) >>> 1)
+sign_field_mask(::Type{Float64}) = ~(~zero(UInt64) >>> 1)
+
+sign_and_exponent_fields_filter(::Type{Float16}) = (~zero(UInt16) >>>  6)
+sign_and_exponent_fields_filter(::Type{Float32}) = (~zero(UInt32) >>>  9)
+sign_and_exponent_fields_filter(::Type{Float64}) = (~zero(UInt64) >>> 12)
+
+sign_and_exponent_fields_mask(::Type{Float16}) = ~(~zero(UInt16) >>>  6)
+sign_and_exponent_fields_mask(::Type{Float32}) = ~(~zero(UInt32) >>>  9)
+sign_and_exponent_fields_mask(::Type{Float64}) = ~(~zero(UInt64) >>> 12)
+
+exponent_field_filter(::Type{Float16}) = (~zero(UInt16) >>>  6) | (one(UInt16) << 15)6) | (one(UInt16) << 
+exponent_field_filter(::Type{Float32}) = (~zero(UInt32) >>>  9) | (one(UInt32) << 31)
+exponent_field_filter(::Type{Float64}) = (~zero(UInt6​
+144
+# zero the field and yield other bit values, in place
+145
+4) >>> 12) | (one(UInt64) << 63)
+
+exponent_field_mask(::Type{Float16}) = ~((~zero(UInt16) >>>  6) | (one(UInt16) << 15))
+exponent_field_mask(::Type{Float32}) = ~((~zero(UInt32) >>>  9) | (one(UInt32) << 31))
+exponent_field_mask(::Type{Float64}) = ~((~zero(UInt64) >>> 12) | (one(UInt64) << 63))
+
+significand_field_filter(::Type{Float16}) = (~zero(UInt16) << 10)
+significand_field_filter(::Type{Float32}) = (~zero(UInt32) << 23)
+significand_field_filter(::Type{Float64}) = (~zero(UInt64) << 52)
+
+significand_field_mask(::Type{Float16}) = ~(~zero(UInt16) << 10)
+significand_field_mask(::Type{Float32}) = ~(~zero(UInt32) << 23)
+significand_field_mask(::Type{Float64}) = ~(~zero(UInt64) << 52)
+
+# isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
+
+sign_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_field_mask(T)
+exponent_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & exponent_field_mask(T)
+significand_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & significand_field_mask(T)
+sign_and_exponent_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_and_exponent_field_mask(T)
+exponent_and_significand_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_field_filter(T)
+sign_and_significand_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & exponent_field_mask(T)
+
+
+
+
+
+
+
+SysFloat,
+       bitwidth, signbit, sign, precision, exponent, significand,
+       exponent_max, exponent_min, exponent_field_max,
+       
+       iszero, isone, isnormal, issubnormal, isfinite, isinf, isnan, isqnan, issnan, notfinite,
+       
+       sign_field_mask,   exponent_field_mask,   significand_field_mask,   sign_exponent_fields_mask,
+       sign_field_filter, exponent_field_filter, significand_field_filter, sign_exponent_fields_filter,
+       
+       sign_field_offset,   exponent_field_offset,   significand_field_offset,
+       sign_field_bitwidth, exponent_field_bitwidth, significand_field_bitwidth,
+       
+       exponent_max, exponent_min, exponent_bias,  normal_exponent_max, normal_exponent_min, 
+       
+       explicit_significand_max, explicit_significand_min, implicit_significand_max, implicit_significand_min,
+       
+       subnormal_exponent_max, subnormal_exponent_min, subnormal_significand_max, subnormal_significand_min,
+       
+       
+       
+       
+       
+
+#=
+   for Float128, Float256 types
+   
+precision(::Type{Float128}) = 113
+precision(::Type{Float256}) = 237
+
+significand_bits(::Type{Float128}) = 112
+significand_bits(::Type{Float256}) = 236
+
+exponent_bits(::Type{Float128}) = 15
+exponent_bits(::Type{Float256}) = 19
+
+exponent_max(::Type{Float128}) =  16383
+exponent_max(::Type{Float256}) = 262143
+
+exponent_min(::Type{Float128}) =  -16382
+exponent_min(::Type{Float256}) = -262142
+
+exponent_bias(::Type{Float128}) =  16383
+exponent_bias(::Type{Float256}) = 262143
+
+exponent_field_max(::Type{Float128}) =  16384
+exponent_field_max(::Type{Float256}) = 262144
+=#
+
+
+## IEEE754-2008 conformant constants for Float64, Float32, Float16
+
+```julia
+const SysFloat = Union{Float16, Float32, Float64}
+
+@inline bitwidth(::Type{T}) where T<:SysFloat = sizeof(T) * 8
+
+# precision, significand_bits and exponent_bits are unchanged
+
+precision(::Type{T}) where T<:SysFloat = Base.Math.precision(T)
+significand_bits(::Type{T}) where T<:SysFloat = Base.Math.significand_bits(T)
+exponent_bits(::Type{T}) where T<:SysFloat = Base.Math.exponent_bits(T)
+
+# exponent_max (Emax in the standard) is an IEEE754-2008 standard term;
+#   The standard tabulates its values (see Table 3.2 on page 8).
+# Julia had defined it in a nonstandard manner. This is conformant:
+
+exponent_max(::Type{Float16}) =   15
+exponent_max(::Type{Float32}) =  127
+exponent_max(::Type{Float64}) = 1023
+
+# exponent_min (Emin) is another standard term
+# it is fully determined by exponent_max:
+
+exponent_min(::Type{T}) where T<:StdFloat = 1 - exponent_max(T)
+
+# exponent_bias (bias) is defined equal to exponent_max
+
+exponent_bias(::Type{T}) where T<:StdFloat = exponent_max(T)
+
+# The value Julia has called exponent_max does not appear
+# in the standard (nor do its values).  It is useful.
+
+exponent_field_max(::Type{T}) where T<:StdFloat = exponent_max(T) + 1
+
+```
+
+## all values
+
+```julia
+precision(::Type{Float16})  =  11
+precision(::Type{Float32})  =  24
+precision(::Type{Float64})  =  53
+precision(::Type{Float128}) = 113
+precision(::Type{Float256}) = 237
+
+significand_bits(::Type{Float16})  =  10
+significand_bits(::Type{Float32})  =  23
+significand_bits(::Type{Float64})  =  52
+significand_bits(::Type{Float128}) = 112
+significand_bits(::Type{Float256}) = 236
+
+exponent_bits(::Type{Float16})  =  5
+exponent_bits(::Type{Float32})  =  8
+exponent_bits(::Type{Float64})  = 11
+exponent_bits(::Type{Float128}) = 15
+exponent_bits(::Type{Float256}) = 19
+
+exponent_max(::Type{Float16})  =     15
+exponent_max(::Type{Float32})  =    127
+exponent_max(::Type{Float64})  =   1023
+exponent_max(::Type{Float128}) =  16383
+exponent_max(::Type{Float256}) = 262143
+
+exponent_min(::Type{Float16})  =     -14
+exponent_min(::Type{Float32})  =    -126
+exponent_min(::Type{Float64})  =   -1022
+exponent_min(::Type{Float128}) =  -16382
+exponent_min(::Type{Float256}) = -262142
+
+exponent_bias(::Type{Float16})  =     15
+exponent_bias(::Type{Float32})  =    127
+exponent_bias(::Type{Float64})  =   1023
+exponent_bias(::Type{Float128}) =  16383
+exponent_bias(::Type{Float256}) = 262143
+
+exponent_field_max(::Type{Float16})  =     16
+exponent_field_max(::Type{Float32})  =    128
+exponent_field_max(::Type{Float64})  =   1024
+exponent_field_max(::Type{Float128}) =  16384
+exponent_field_max(::Type{Float256}) = 262144
+```
