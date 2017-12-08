@@ -21,17 +21,35 @@ const SysFloats = Union{Float64, Float32, Float16}
 
 @inline exponent_field_max(::Type{T}) where T<:SysFloats = exponent_max(T) + one(convert(Signed, T))
 
-
-
 # ~~~~~~~~~~~~~~~~
 
 @inline sign_field_offset(::Type{T}) where T<:SysFloats = bitwidth(T) - one(convert(Signed, T))
 @inline exponent_field_offset(::Type{T}) where T<:SysFloats = sign_field_offset(T) - exponent_bits(T)
 @inline significand_field_offset(::Type{T}) where T<:SysFloats = zero(convert(Signed, T))
 
+@inline sign_field_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> 1
+@inline sign_and_exponent_fields_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
+@inline exponent_field_filter(::Type{T}) where T<:SysFloats = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
+@inline significand_field_filter(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_filter(T)
+
+@inline sign_field_mask(::Type{T}) where T<:SysFloats = ~sign_field_filter(T)
+@inline sign_and_exponent_fields_mask(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_filter(T)
+@inline exponent_field_mask(::Type{T}) where T<:SysFloats = ~exponent_field_filter(T)
+@inline significand_field_mask(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_mask(T)
 
 # ~~~~~~~~~~~~~~~~
 
+# isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
+
+sign_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_field_mask(T)
+exponent_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & exponent_field_mask(T)
+significand_field(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & significand_field_mask(T)
+sign_and_exponent_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_and_exponent_field_mask(T)
+exponent_and_significand_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & sign_field_filter(T)
+sign_and_significand_fields(x::T) where T<:SysFloat = reinterpret(Unsigned, x) & exponent_field_mask(T)
+
+
+# ~~~~~~~~~~~~~~~~
 
 @inline Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
 @inline Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
@@ -50,6 +68,8 @@ const SysFloats = Union{Float64, Float32, Float16}
 @inline Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
 
 end # SysFloats
+
+#=
 
 import Base.Math: precision, significand_bits, exponent_bits
 
@@ -108,7 +128,7 @@ const SysFloats = Union{Float64, Float32, Float16}
 @inline Base.convert(::Type{SysFloat}, x::Int64) = reinterpret(Float64, x)
 
 end # module
-
+=#
 
 #=
 export SysFloats, precision, significand_bits, exponent_bits,
