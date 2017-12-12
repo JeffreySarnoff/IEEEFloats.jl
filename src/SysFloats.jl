@@ -1,8 +1,11 @@
 module SysFloats
 
 export bitwidth, signbit, sign, precision, exponent, significand,
-       exponent_max, exponent_min, exponent_field_max
-
+       exponent_max, exponent_min, exponent_field_max,
+       get_sign_field, get_exponent_field, get_signficand_field,
+       get_sign_and_exponent_fields, get_exponent_and_significand_fields,
+       set_sign_field, set_exponent_field, set_signficand_field,
+       set_sign_and_exponent_fields, set_exponent_and_significand_fields
 
 import Base.Math: precision, significand_bits, exponent_bits
 
