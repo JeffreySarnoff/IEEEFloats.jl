@@ -4,13 +4,13 @@
 
 IEEEFloat == Base.IEEEFloat == Union{Float16, Float32, Float64}
 
-@inline bitwidth(::Type{T}) where T<:SysFloat = sizeof(T) * 8
+@inline bitwidth(::Type{T}) where T<:IEEEFloat = sizeof(T) * 8
 
 # precision, significand_bits and exponent_bits are unchanged
 
-precision(::Type{T}) where T<:SysFloat = Base.Math.precision(T)
-significand_bits(::Type{T}) where T<:SysFloat = Base.Math.significand_bits(T)
-exponent_bits(::Type{T}) where T<:SysFloat = Base.Math.exponent_bits(T)
+precision(::Type{T}) where T<:IEEEFloat = Base.Math.precision(T)
+significand_bits(::Type{T}) where T<:IEEEFloat = Base.Math.significand_bits(T)
+exponent_bits(::Type{T}) where T<:IEEEFloat = Base.Math.exponent_bits(T)
 
 # exponent_max (Emax in the standard) is an IEEE754-2008 standard term;
 #   The standard tabulates its values (see Table 3.2 on page 8).
