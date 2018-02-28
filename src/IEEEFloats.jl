@@ -115,19 +115,12 @@ for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filt
   end
 end
 
-# convert used as a generalized reinterpret
-
-@inline Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
-@inline Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
-@inline Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
-
-@inline Base.reinterpret(::Type{Signed}, ::Type{Float64}) = Int64
-@inline Base.reinterpret(::Type{Signed}, ::Type{Float32}) = Int32
-@inline Base.reinterpret(::Type{Signed}, ::Type{Float16}) = Int16
-
-@inline Base.reinterpret(::Type{Integer}, ::Type{Float64}) = Int64
-@inline Base.reinterpret(::Type{Integer}, ::Type{Float32}) = Int32
-@inline Base.reinterpret(::Type{Integer}, ::Type{Float16}) = Int16
+# more general reinterpret
+# Base provides reinterpret for (Signed, FloatNN), (Signed, x::FloatNN), and (Integer, _)
+ 
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{Float64}) = UInt64
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{Float32}) = UInt32
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{Float16}) = UInt16
 
 @inline Base.reinterpret(::Type{IEEEFloat}, ::Type{UInt64}) = Float64
 @inline Base.reinterpret(::Type{IEEEFloat}, ::Type{UInt32}) = Float32
@@ -140,13 +133,5 @@ end
 @inline Base.reinterpret(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
 @inline Base.reinterpret(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
 @inline Base.reinterpret(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
-
-@inline Base.reinterpret(::Type{Signed}, x::Float64) = reinterpret(Int64, x)
-@inline Base.reinterpret(::Type{Signed}, x::Float32) = reinterpret(Int32, x)
-@inline Base.reinterpret(::Type{Signed}, x::Float16) = reinterpret(Int16, x)
-
-@inline Base.reinterpret(::Type{Integer}, x::Float64) = reinterpret(Int64, x)
-@inline Base.reinterpret(::Type{Integer}, x::Float32) = reinterpret(Int32, x)
-@inline Base.reinterpret(::Type{Integer}, x::Float16) = reinterpret(Int16, x)
 
 end # module IEEEFloats
