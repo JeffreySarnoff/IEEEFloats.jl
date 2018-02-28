@@ -1,4 +1,4 @@
-module SysFloats
+module IEEEFloats
 
 export bitwidth, signbit, sign, precision, exponent, significand,
        exponent_max, exponent_min, exponent_field_max,
@@ -6,13 +6,14 @@ export bitwidth, signbit, sign, precision, exponent, significand,
        get_sign_field, get_exponent_field, get_signficand_field,
        get_sign_and_exponent_fields, get_exponent_and_significand_fields,
        set_sign_field, set_exponent_field, set_signficand_field,
-       set_sign_and_exponent_fields, set_exponent_and_significand_fields
+       set_sign_and_exponent_fields, set_exponent_and_significand_fields,
+       IEEEFloat
 
+import Base.Math.IEEEFloat
 import Base.Math: precision, significand_bits, exponent_bits
 
-const SysFloat = Union{Float64, Float32, Float16}
 
-@inline bitwidth(::Type{T}) where T<:SysFloats = sizeof(T) * 8
+@inline bitwidth(::Type{T}) where T<:IEEEFloat = sizeof(T) * 8
 
 @inline exponent_max(::Type{Float16})  =     15
 @inline exponent_max(::Type{Float32})  =    127
@@ -34,39 +35,39 @@ const SysFloat = Union{Float64, Float32, Float16}
 @inline floatint_min(::Type{Float32}) = Float32(intfloat_min(Float32))
 @inline floatint_min(::Type{Float64}) = Float64(intfloat_min(Float64))
 
-@inline exponent_min(::Type{T}) where T<:SysFloats = 1 - exponent_max(T)
+@inline exponent_min(::Type{T}) where T<:IEEEFloat = 1 - exponent_max(T)
 
-@inline exponent_bias(::Type{T}) where T<:SysFloats = exponent_max(T)
+@inline exponent_bias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
 
-@inline exponent_field_max(::Type{T}) where T<:SysFloats = exponent_max(T) + one(convert(Signed, T))
+@inline exponent_field_max(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(convert(Signed, T))
 
 # field[s] offset (shift by)
 
-@inline sign_field_offset(::Type{T}) where T<:SysFloats = bitwidth(T) - one(convert(Signed, T))
-@inline exponent_field_offset(::Type{T}) where T<:SysFloats = sign_field_offset(T) - exponent_bits(T)
-@inline significand_field_offset(::Type{T}) where T<:SysFloats = zero(convert(Signed, T))
-@inline sign_and_exponent_fields_offset(::Type{T}) where T<:SysFloats = exponent_field_offset(T)
-@inline exponent_and_significand_fields_offset(::Type{T}) where T<:SysFloats = significand_field_offset(T)
+@inline sign_field_offset(::Type{T}) where T<:IEEEFloat = bitwidth(T) - one(convert(Signed, T))
+@inline exponent_field_offset(::Type{T}) where T<:IEEEFloat = sign_field_offset(T) - exponent_bits(T)
+@inline significand_field_offset(::Type{T}) where T<:IEEEFloat = zero(convert(Signed, T))
+@inline sign_and_exponent_fields_offset(::Type{T}) where T<:IEEEFloat = exponent_field_offset(T)
+@inline exponent_and_significand_fields_offset(::Type{T}) where T<:IEEEFloat = significand_field_offset(T)
 
 # field[s] filter and mask
 
-@inline sign_field_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> 1
-@inline sign_and_exponent_fields_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
-@inline exponent_field_filter(::Type{T}) where T<:SysFloats = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
-@inline significand_field_filter(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_filter(T)
-@inline exponent_and_significand_fields_filter(::Type{T}) where T<:SysFloats = ~(sign_field_filter(T))
+@inline sign_field_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> 1
+@inline sign_and_exponent_fields_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
+@inline exponent_field_filter(::Type{T}) where T<:IEEEFloat = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
+@inline significand_field_filter(::Type{T}) where T<:IEEEFloat = ~sign_and_exponent_fields_filter(T)
+@inline exponent_and_significand_fields_filter(::Type{T}) where T<:IEEEFloat = ~(sign_field_filter(T))
 
-@inline sign_field_mask(::Type{T}) where T<:SysFloats = ~sign_field_filter(T)
-@inline sign_and_exponent_fields_mask(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_filter(T)
-@inline exponent_field_mask(::Type{T}) where T<:SysFloats = ~exponent_field_filter(T)
-@inline significand_field_mask(::Type{T}) where T<:SysFloats = ~sign_and_exponent_fields_mask(T)
-@inline exponent_and_significand_fields_mask(::Type{T}) where T<:SysFloats = ~exponent_and_significand_fields_mask(T)
+@inline sign_field_mask(::Type{T}) where T<:IEEEFloat = ~sign_field_filter(T)
+@inline sign_and_exponent_fields_mask(::Type{T}) where T<:IEEEFloat = ~sign_and_exponent_fields_filter(T)
+@inline exponent_field_mask(::Type{T}) where T<:IEEEFloat = ~exponent_field_filter(T)
+@inline significand_field_mask(::Type{T}) where T<:IEEEFloat = ~sign_and_exponent_fields_mask(T)
+@inline exponent_and_significand_fields_mask(::Type{T}) where T<:IEEEFloat = ~exponent_and_significand_fields_mask(T)
 
-@inline sign_field_mask_lsbs(::Type{T}) where T<:SysFloats = sign_field_mask(T) >> sign_field_offset(T)
-@inline sign_and_exponent_fields_mask_lsbs(::Type{T}) where T<:SysFloats = sign_and_exponent_fields_mask(T) >> exponent_field_offset(T)
-@inline exponent_field_mask_lsbs(::Type{T}) where T<:SysFloats = exponent_field_mask(T) >> exponent_field_offset(T)
-@inline significand_field_mask_lsbs(::Type{T}) where T<:SysFloats = significand_fields_mask(T) >> significand_field_offset(T)
-@inline exponent_and_significand_fields_mask_lsbs(::Type{T}) where T<:SysFloats = exponent_and_significand_fields_mask(T) >> significand_field_offset(T)
+@inline sign_field_mask_lsbs(::Type{T}) where T<:IEEEFloat = sign_field_mask(T) >> sign_field_offset(T)
+@inline sign_and_exponent_fields_mask_lsbs(::Type{T}) where T<:IEEEFloat = sign_and_exponent_fields_mask(T) >> exponent_field_offset(T)
+@inline exponent_field_mask_lsbs(::Type{T}) where T<:IEEEFloat = exponent_field_mask(T) >> exponent_field_offset(T)
+@inline significand_field_mask_lsbs(::Type{T}) where T<:IEEEFloat = significand_fields_mask(T) >> significand_field_offset(T)
+@inline exponent_and_significand_fields_mask_lsbs(::Type{T}) where T<:IEEEFloat = exponent_and_significand_fields_mask(T) >> significand_field_offset(T)
 
 # isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
 
@@ -132,21 +133,21 @@ end
 @inline Base.convert(::Type{SysFloat}, x::UInt32) = reinterpret(Float32, x)
 @inline Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
 
-end # SysFloats
+end # IEEEFloat
 
 #=
 
 import Base.Math: precision, significand_bits, exponent_bits
 
-const SysFloats = Union{Float64, Float32, Float16}
+const IEEEFloat = Union{Float64, Float32, Float16}
 
-(::Type{T}) where T<:SysFloats =@inline bitwidth(::Type{T}) where T = sizeof(T) * 8
+(::Type{T}) where T<:IEEEFloat =@inline bitwidth(::Type{T}) where T = sizeof(T) * 8
 
 @inline exponent_max(::Type{Float16})  =     15
 @inline exponent_max(::Type{Float32})  =    127
 @inline exponent_max(::Type{Float64})  =   1023
 
-@inline exponent_min(::Type{T}) where T<:SysFloats = 1 - exponent_max(T)
+@inline exponent_min(::Type{T}) where T<:IEEEFloat = 1 - exponent_max(T)
 
 @inline Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
 @inline Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
@@ -163,17 +164,17 @@ const SysFloats = Union{Float64, Float32, Float16}
 @inline Base.convert(::Type{SysFloat}, x::UInt16) = reinterpret(Float16, x)
 @inline Base.convert(::Type{SysFloat}, x::UInt32) = reinterpret(Float32, x)
 @inline Base.convert(::Type{SysFloat}, x::UInt64) = reinterpret(Float64, x)
-@inline exponent_bias(::Type{T}) where T<:SysFloats = exponent_max(T)
+@inline exponent_bias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
 
-@inline exponent_field_max(::Type{T}) where T<:SysFloats = exponent_max(T) + one(convert(Signed, T))
+@inline exponent_field_max(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(convert(Signed, T))
 
 
 
 # ~~~~~~~~~~~~~~~~
 
-@inline sign_field_offset(::Type{T}) where T<:SysFloats = bitwidth(T) - one(convert(Signed, T))
-@inline exponent_field_offset(::Type{T}) where T<:SysFloats = sign_field_offset(T) - exponent_bits(T)
-@inline significand_field_offset(::Type{T}) where T<:SysFloats = zero(convert(Signed, T))
+@inline sign_field_offset(::Type{T}) where T<:IEEEFloat = bitwidth(T) - one(convert(Signed, T))
+@inline exponent_field_offset(::Type{T}) where T<:IEEEFloat = sign_field_offset(T) - exponent_bits(T)
+@inline significand_field_offset(::Type{T}) where T<:IEEEFloat = zero(convert(Signed, T))
 
 
 @inline Base.convert(::Type{Signed}, ::Type{Float16}) = Int16
@@ -196,40 +197,40 @@ end # module
 =#
 
 #=
-export SysFloats, precision, significand_bits, exponent_bits,
+export IEEEFloat, precision, significand_bits, exponent_bits,
        exponent_max, exponent_min, exponent_bias, exponent_field_max,
 
 import Base.Math: precision, significand_bits, exponent_bits
 
-const SysFloats = Union{Float64, Float32, Float16}
+const IEEEFloat = Union{Float64, Float32, Float16}
 
-(::Type{T}) where T<:SysFloats =@inline bitwidth(::Type{T}) where T = sizeof(T) * 8
+(::Type{T}) where T<:IEEEFloat =@inline bitwidth(::Type{T}) where T = sizeof(T) * 8
 
 @inline exponent_max(::Type{Float16})  =     15
 @inline exponent_max(::Type{Float32})  =    127
 @inline exponent_max(::Type{Float64})  =   1023
 
-@inline exponent_min(::Type{T}) where T<:SysFloats = 1 - exponent_max(T)
+@inline exponent_min(::Type{T}) where T<:IEEEFloat = 1 - exponent_max(T)
 
-@inline exponent_bias(::Type{T}) where T<:SysFloats = exponent_max(T)
+@inline exponent_bias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
 
-@inline exponent_field_max(::Type{T}) where T<:SysFloats = exponent_max(T) + one(convert(Signed, T))
+@inline exponent_field_max(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(convert(Signed, T))
 
 
 
 # ~~~~~~~~~~~~~~~~
 
-@inline sign_field_offset(::Type{T}) where T<:SysFloats = bitwidth(T) - one(convert(Signed, T))
-@inline exponent_field_offset(::Type{T}) where T<:SysFloats = sign_field_offset(T) - exponent_bits(T)
-@inline significand_field_offset(::Type{T}) where T<:SysFloats = zero(convert(Signed, T))
+@inline sign_field_offset(::Type{T}) where T<:IEEEFloat = bitwidth(T) - one(convert(Signed, T))
+@inline exponent_field_offset(::Type{T}) where T<:IEEEFloat = sign_field_offset(T) - exponent_bits(T)
+@inline significand_field_offset(::Type{T}) where T<:IEEEFloat = zero(convert(Signed, T))
 
-@inline sign_field_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> 1
-@inline sign_and_exponent_fields_filter(::Type{T}) where T<:SysFloats = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
-@inline exponent_field_filter(::Type{T}) where T<:SysFloats = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
+@inline sign_field_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> 1
+@inline sign_and_exponent_fields_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
+@inline exponent_field_filter(::Type{T}) where T<:IEEEFloat = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
 
-@inline sign_field_mask(::Type{T}) where T<:SysFloats = ~sign_field_filter(T)
-@inline sign_and_exponent_fields_mask(::Type{T}) where T<:SysFloats = ~sign_and_exponent_field_filter(T)
-@inline exponent_field_mask(::Type{T}) where T<:SysFloats = ~exponent_field_filter(T)
+@inline sign_field_mask(::Type{T}) where T<:IEEEFloat = ~sign_field_filter(T)
+@inline sign_and_exponent_fields_mask(::Type{T}) where T<:IEEEFloat = ~sign_and_exponent_field_filter(T)
+@inline exponent_field_mask(::Type{T}) where T<:IEEEFloat = ~exponent_field_filter(T)
 
 # ~~~~~~~~~~~~~~~~
 
