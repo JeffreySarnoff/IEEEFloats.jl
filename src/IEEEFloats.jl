@@ -71,21 +71,21 @@ import Base.Math: precision, significand_bits, exponent_bits
 
 # isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
 
-@inline sign_field(x::T) where T<:SysFloat = convert(Unsigned, x) & sign_field_mask(T)
-@inline exponent_field(x::T) where T<:SysFloat = convert(Unsigned, x) & exponent_field_mask(T)
-@inline significand_field(x::T) where T<:SysFloat = convert(Unsigned, x) & significand_field_mask(T)
-@inline sign_and_exponent_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & sign_and_exponent_field_mask(T)
-@inline exponent_and_significand_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & sign_field_filter(T)
-@inline sign_and_significand_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & exponent_field_mask(T)
+@inline sign_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_field_mask(T)
+@inline exponent_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_field_mask(T)
+@inline significand_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & significand_field_mask(T)
+@inline sign_and_exponent_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_and_exponent_field_mask(T)
+@inline exponent_and_significand_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_field_filter(T)
+@inline sign_and_significand_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_field_mask(T)
 
 # clear the field[s] and yield the value, as Unsigned bits in place
 
-@inline clear_sign_field(x::T) where T<:SysFloat = convert(Unsigned, x) & sign_field_filter(T)
-@inline clear_exponent_field(x::T) where T<:SysFloat = convert(Unsigned, x) & exponent_field_filter(T)
-@inline clear_significand_field(x::T) where T<:SysFloat = convert(Unsigned, x) & significand_field_filter(T)
-@inline clear_sign_and_exponent_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & sign_and_exponent_field_filter(T)
-@inline clear_exponent_and_significand_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & exponent_and_significand_fields_filter(T)
-@inline clear_sign_and_significand_fields(x::T) where T<:SysFloat = convert(Unsigned, x) & exponent_field_mask(T)
+@inline clear_sign_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_field_filter(T)
+@inline clear_exponent_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_field_filter(T)
+@inline clear_significand_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & significand_field_filter(T)
+@inline clear_sign_and_exponent_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_and_exponent_field_filter(T)
+@inline clear_exponent_and_significand_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_and_significand_fields_filter(T)
+@inline clear_sign_and_significand_fields(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_field_mask(T)
 
 # fetch the field[s] into the low order bits of an Unsigned
 
