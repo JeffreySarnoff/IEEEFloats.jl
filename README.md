@@ -1,7 +1,8 @@
 ## IEEE754-2008 conformant constants for Float64, Float32, Float16
 
 ```julia
-const SysFloat = Union{Float16, Float32, Float64}
+
+IEEEFloat == Base.IEEEFloat == Union{Float16, Float32, Float64}
 
 @inline bitwidth(::Type{T}) where T<:SysFloat = sizeof(T) * 8
 
