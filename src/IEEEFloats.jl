@@ -117,7 +117,35 @@ end
 
 # more general reinterpret
 # Base provides reinterpret for (Signed, FloatNN), (Signed, x::FloatNN), and (Integer, _)
- 
+
+# idempotents
+
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{UInt64}) = UInt64
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{UInt32}) = UInt32
+@inline Base.reinterpret(::Type{Unsigned}, ::Type{UInt16}) = UInt16
+
+@inline Base.reinterpret(::Type{Signed}, ::Type{Int64}) = Int64
+@inline Base.reinterpret(::Type{Signed}, ::Type{Int32}) = Int32
+@inline Base.reinterpret(::Type{Signed}, ::Type{Int16}) = Int16
+
+@inline Base.reinterpret(::Type{IEEEFloat}, ::Type{Float64}) = Float64
+@inline Base.reinterpret(::Type{IEEEFloat}, ::Type{Float32}) = Float32
+@inline Base.reinterpret(::Type{IEEEFloat}, ::Type{Float16}) = Float16
+
+@inline Base.reinterpret(::Type{Unsigned}, x::UInt64) = x
+@inline Base.reinterpret(::Type{Unsigned}, x::UInt32) = x
+@inline Base.reinterpret(::Type{Unsigned}, x::UInt16) = x
+
+@inline Base.reinterpret(::Type{Signed}, x::Int64) = x
+@inline Base.reinterpret(::Type{Signed}, x::Int32) = x
+@inline Base.reinterpret(::Type{Signed}, x::Int16) = x
+
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Float64) = x
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Float32) = x
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Float16) = x
+
+# reinterpretations
+
 @inline Base.reinterpret(::Type{Unsigned}, ::Type{Float64}) = UInt64
 @inline Base.reinterpret(::Type{Unsigned}, ::Type{Float32}) = UInt32
 @inline Base.reinterpret(::Type{Unsigned}, ::Type{Float16}) = UInt16
@@ -133,5 +161,21 @@ end
 @inline Base.reinterpret(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
 @inline Base.reinterpret(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
 @inline Base.reinterpret(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
+
+@inline Base.reinterpret(::Type{Signed}, x::Float64) = reinterpret(Int64, x)
+@inline Base.reinterpret(::Type{Signed}, x::Float32) = reinterpret(Int32, x)
+@inline Base.reinterpret(::Type{Signed}, x::Float16) = reinterpret(Int16, x)
+
+@inline Base.reinterpret(::Type{Integer}, x::Float64) = reinterpret(Int64, x)
+@inline Base.reinterpret(::Type{Integer}, x::Float32) = reinterpret(Int32, x)
+@inline Base.reinterpret(::Type{Integer}, x::Float16) = reinterpret(Int16, x)
+
+@inline Base.reinterpret(::Type{IEEEFloat}, x::UInt64) = reinterpret(Float64, x)
+@inline Base.reinterpret(::Type{IEEEFloat}, x::UInt32) = reinterpret(Float32, x)
+@inline Base.reinterpret(::Type{IEEEFloat}, x::UInt16) = reinterpret(Float16, x)
+
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Int64) = reinterpret(Float64, x)
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Int32) = reinterpret(Float32, x)
+@inline Base.reinterpret(::Type{IEEEFloat}, x::Int16) = reinterpret(Float16, x)
 
 end # module IEEEFloats
