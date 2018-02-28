@@ -2,6 +2,7 @@ module SysFloats
 
 export bitwidth, signbit, sign, precision, exponent, significand,
        exponent_max, exponent_min, exponent_field_max,
+       intfloat_max, intfloat_min, floatint_max, floatint_min,
        get_sign_field, get_exponent_field, get_signficand_field,
        get_sign_and_exponent_fields, get_exponent_and_significand_fields,
        set_sign_field, set_exponent_field, set_signficand_field,
@@ -16,6 +17,22 @@ const SysFloat = Union{Float64, Float32, Float16}
 @inline exponent_max(::Type{Float16})  =     15
 @inline exponent_max(::Type{Float32})  =    127
 @inline exponent_max(::Type{Float64})  =   1023
+
+@inline intfloat_max(::Type{Float16}) = Int16(2048)
+@inline intfloat_max(::Type{Float32}) = Int32(16777216)
+@inline intfloat_max(::Type{Float64}) = Int64(9007199254740992)
+
+@inline intfloat_min(::Type{Float16}) = Int16(-2048)
+@inline intfloat_min(::Type{Float32}) = Int32(-16777216)
+@inline intfloat_min(::Type{Float64}) = Int64(-9007199254740992)
+
+@inline floatint_max(::Type{Float16}) = Float16(intfloat_max(Float16))
+@inline floatint_max(::Type{Float32}) = Float32(intfloat_max(Float32))
+@inline floatint_max(::Type{Float64}) = Float64(intfloat_max(Float64))
+
+@inline floatint_min(::Type{Float16}) = Float16(intfloat_min(Float16))
+@inline floatint_min(::Type{Float32}) = Float32(intfloat_min(Float32))
+@inline floatint_min(::Type{Float64}) = Float64(intfloat_min(Float64))
 
 @inline exponent_min(::Type{T}) where T<:SysFloats = 1 - exponent_max(T)
 
