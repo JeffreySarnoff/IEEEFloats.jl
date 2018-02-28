@@ -38,45 +38,53 @@ exponent_field_max(::Type{T}) where T<:StdFloat = exponent_max(T) + 1
 ## all values
 
 ```julia
-precision(::Type{Float16})  =  11
-precision(::Type{Float32})  =  24
-precision(::Type{Float64})  =  53
-precision(::Type{Float128}) = 113
-precision(::Type{Float256}) = 237
+precision(Float16)  =  11
+precision(Float32)  =  24
+precision(Float64)  =  53
 
-significand_bits(::Type{Float16})  =  10
-significand_bits(::Type{Float32})  =  23
-significand_bits(::Type{Float64})  =  52
-significand_bits(::Type{Float128}) = 112
-significand_bits(::Type{Float256}) = 236
+significand_bits(Float16)  =  10
+significand_bits(Float32)  =  23
+significand_bits(Float64)  =  52
 
-exponent_bits(::Type{Float16})  =  5
-exponent_bits(::Type{Float32})  =  8
-exponent_bits(::Type{Float64})  = 11
-exponent_bits(::Type{Float128}) = 15
-exponent_bits(::Type{Float256}) = 19
+exponent_bits(Float16)  =  5
+exponent_bits(Float32)  =  8
+exponent_bits(Float64)  = 11
 
-exponent_max(::Type{Float16})  =     15
-exponent_max(::Type{Float32})  =    127
-exponent_max(::Type{Float64})  =   1023
-exponent_max(::Type{Float128}) =  16383
-exponent_max(::Type{Float256}) = 262143
+exponent_max(Float16)  =     15
+exponent_max(Float32)  =    127
+exponent_max(Float64)  =   1023
 
-exponent_min(::Type{Float16})  =     -14
-exponent_min(::Type{Float32})  =    -126
-exponent_min(::Type{Float64})  =   -1022
-exponent_min(::Type{Float128}) =  -16382
-exponent_min(::Type{Float256}) = -262142
+exponent_min(Float16)  =     -14
+exponent_min(Float32)  =    -126
+exponent_min(Float64)  =   -1022
 
-exponent_bias(::Type{Float16})  =     15
-exponent_bias(::Type{Float32})  =    127
-exponent_bias(::Type{Float64})  =   1023
-exponent_bias(::Type{Float128}) =  16383
-exponent_bias(::Type{Float256}) = 262143
+exponent_bias(Float16)  =     15
+exponent_bias(Float32)  =    127
+exponent_bias(Float64)  =   1023
 
-exponent_field_max(::Type{Float16})  =     16
-exponent_field_max(::Type{Float32})  =    128
-exponent_field_max(::Type{Float64})  =   1024
-exponent_field_max(::Type{Float128}) =  16384
-exponent_field_max(::Type{Float256}) = 262144
+exponent_field_max(Float16)  =     16
+exponent_field_max(Float32)  =    128
+exponent_field_max(Float64)  =   1024
+
+# intfloat_max(FloatNN) is the most positive IntNN I where FloatNN(I-1) is representable
+# intfloat_min(FloatNN) is the most negative IntNN I where FloatNN(I+1) is representable 
+
+intfloat_max(Float16) = Int16(2048)
+intfloat_max(Float32) = Int32(16777216)
+intfloat_max(Float64) = Int64(9007199254740992)
+
+intfloat_min(Float16) = Int16(-2048)
+intfloat_min(Float32) = Int32(-16777216)
+intfloat_min(Float64) = Int64(-9007199254740992)
+
+# floatint_max(FloatNN) is FloatNN(intfloat_max(FloatNN))
+# floatint_min(FloatNN) is FloatNN(intfloat_min(FloatNN))
+
+floatint_max(Float16) = Float16(2048)
+floatint_max(Float32) = Float32(16777216)
+floatint_max(Float64) = Float64(9007199254740992)
+
+floatint_min(Float16) = Float16(-2048)
+floatint_min(Float32) = Float32(-16777216)
+floatint_min(Float64) = Float64(-9007199254740992)
 ```
