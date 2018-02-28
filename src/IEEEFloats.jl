@@ -149,4 +149,4 @@ end
 @inline Base.reinterpret(::Type{Integer}, x::Float32) = reinterpret(Int32, x)
 @inline Base.reinterpret(::Type{Integer}, x::Float16) = reinterpret(Int16, x)
 
-end # IEEEFloat
+end # module IEEEFloats
