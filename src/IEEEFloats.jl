@@ -7,7 +7,8 @@ export bitwidth, signbit, sign, precision, exponent, significand,
        get_sign_and_exponent_fields, get_exponent_and_significand_fields,
        set_sign_field, set_exponent_field, set_signficand_field,
        set_sign_and_exponent_fields, set_exponent_and_significand_fields,
-       IEEEFloat
+       IEEEFloat,
+       isinfnan, notinfnan
 
 import Base.Math.IEEEFloat
 import Base.Math: precision, significand_bits, exponent_bits
@@ -114,6 +115,10 @@ for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filt
     end
   end
 end
+
+isinfnan(x::Float64) = (reinterpret(UInt64,x) & 0x4000000000000000) === 0x4000000000000000
+notinfnan(x::Float64) = (reinterpret(UInt64,x) & 0x4000000000000000) !== 0x4000000000000000
+
 
 # more general reinterpret
 # Base provides reinterpret for (Signed, FloatNN), (Signed, x::FloatNN), and (Integer, _)
