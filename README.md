@@ -47,6 +47,7 @@ exponentfieldmax(Float16) ==   16
 ## all values
 
 ```julia
+
 precision(Float16)  =  11
 precision(Float32)  =  24
 precision(Float64)  =  53
