@@ -9,7 +9,6 @@ export bitwidth, signbit, sign, precision, exponent, significand,
        set_sign_and_exponent_fields, set_exponent_and_significand_fields,
        IEEEFloat
 
-import Base: Signed, Unsigned, AbstractFloat
 import Base.Math.IEEEFloat
 import Base.Math: precision, significand_bits, exponent_bits
 
@@ -115,25 +114,5 @@ for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filt
     end
   end
 end
-
-
-# more general reinterpret
-
-Base.reinterpret(Unsigned, x::Float64) = Base.reinterpret(UInt64, x)
-Base.reinterpret(Unsigned, x::Float32) = Base.reinterpret(UInt32, x)
-Base.reinterpret(Unsigned, x::Float16) = Base.reinterpret(UInt16, x)
-
-Base.reinterpret(Signed, x::Float64) = Base.reinterpret(Int64, x)
-Base.reinterpret(Signed, x::Float32) = Base.reinterpret(Int32, x)
-Base.reinterpret(Signed, x::Float16) = Base.reinterpret(Int16, x)
-
-Base.reinterpret(AbstractFloat, x::UInt64) = Base.reinterpret(Float64, x)
-Base.reinterpret(AbstractFloat, x::UInt32) = Base.reinterpret(Float32, x)
-Base.reinterpret(AbstractFloat, x::UInt16) = Base.reinterpret(Float16, x)
-
-Base.reinterpret(AbstractFloat, x::Int64) = Base.reinterpret(Float64, x)
-Base.reinterpret(AbstractFloat, x::Int32) = Base.reinterpret(Float32, x)
-Base.reinterpret(AbstractFloat, x::Int16) = Base.reinterpret(Float16, x)
-
 
 end # module IEEEFloats
