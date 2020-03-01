@@ -115,7 +115,15 @@ for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filt
   end
 end
 
+# ============== #
+
 exponent_bias(::Type{T}) = 2^(exponent_bits(T) - 1) - 1
+
+
+const bias128 = 16_383 # 15 bits
+const bias64 = exponent_bias(Float64) # 1023
+const bias32 = exponent_bias(Float64) # 127
+const bias16 = exponent_bias(Float64) # 15
 
 exponent_bias(nexpbits) = 2^(nexpbits-1) -1
 unbiased_exponent(nexpbits, biasedexp) = biasedexp - exponent_bias(nexpbits)
