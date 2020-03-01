@@ -9,45 +9,28 @@ export bitwidth, signbit, sign, precision, exponent, significand,
        set_sign_and_exponent_fields, set_exponent_and_significand_fields,
        IEEEFloat
 
-import Base.Math.IEEEFloat
-import Base.Math: precision, significand_bits, exponent_bits
-import Base: signed, unsigned
+using Base: signed, unsigned
+using Base.Math: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
 
-signed(::Type{Float64}) = Int64
-signed(::Type{Float32}) = Int32
-signed(::Type{Float16}) = Int16
+Base.signed(::Type{Float64}) = Int64
+Base.signed(::Type{Float32}) = Int32
+Base.signed(::Type{Float16}) = Int16
 
-unsigned(::Type{Float64}) = UInt64
-unsigned(::Type{Float32}) = UInt32
-unsigned(::Type{Float16}) = UInt16
+Base.unsigned(::Type{Float64}) = UInt64
+Base.unsigned(::Type{Float32}) = UInt32
+Base.unsigned(::Type{Float16}) = UInt16
 
-@inline bitwidth(::Type{T}) where T<:IEEEFloat = sizeof(T) * 8
+bitwidth(::Type{T}) where {T} = sizeof(T) * 8
 
-@inline exponentmax(::Type{Float16})  =     15
-@inline exponentmax(::Type{Float32})  =    127
-@inline exponentmax(::Type{Float64})  =   1023
+exponentmax(::Type{T}) where T =   2^(exponent_bits(T) - 1) - 1  # normal values
+exponentmin(::Type{T}) where T =  1 - exponentmax(T)             # normal values
 
-@inline intfloatmax(::Type{Float16}) = Int16(2048)
-@inline intfloatmax(::Type{Float32}) = Int32(16777216)
-@inline intfloatmax(::Type{Float64}) = Int64(9007199254740992)
+biased_exponentmax(::Type{T}) where T = 2^(exponent_bits(T)) - 1  
+biased_exponentmin(::Type{T}) where T = 0
 
-@inline intfloatmin(::Type{Float16}) = Int16(-2048)
-@inline intfloatmin(::Type{Float32}) = Int32(-16777216)
-@inline intfloatmin(::Type{Float64}) = Int64(-9007199254740992)
+exponentbias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
 
-@inline floatintmax(::Type{Float16}) = Float16(intfloat_max(Float16))
-@inline floatintmax(::Type{Float32}) = Float32(intfloat_max(Float32))
-@inline floatintmax(::Type{Float64}) = Float64(intfloat_max(Float64))
-
-@inline floatintmin(::Type{Float16}) = Float16(intfloat_min(Float16))
-@inline floatintmin(::Type{Float32}) = Float32(intfloat_min(Float32))
-@inline floatintmin(::Type{Float64}) = Float64(intfloat_min(Float64))
-
-@inline exponentmin(::Type{T}) where T<:IEEEFloat = 1 - exponent_max(T)
-
-@inline exponentbias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
-
-@inline exponentfieldmax(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(signed(T))
+exponentfieldmax(::Type{T}) where T<:IEEEFloat = 2^exponent_bits(T) - 1
 
 # field[s] offset (shift by)
 
