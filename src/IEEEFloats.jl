@@ -115,4 +115,19 @@ for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filt
   end
 end
 
+exponent_bias(::Type{T}) = 2^(exponent_bits(T) - 1) - 1
+
+exponent_bias(nexpbits) = 2^(nexpbits-1) -1
+unbiased_exponent(nexpbits, biasedexp) = biasedexp - exponent_bias(nexpbits)
+biased_exponent(nexpbits, unbiasedexp) = unbiasedexp + exponent_bias(nexpbits)
+
+decode_normal_value(nexpbits, nsigbits, significand, unbiasedexponent=0, isneg::Bool=false) =
+    (isneg ? -1 : 1) *
+    (1 + (significand / 2^nsigbits)) *
+    (2.0^(unbiasedexponent - exponent_bias(nexpbits)))
+decode_subnormal_value(nexpbits, nsigbits, significand, unbiasedexponent=0, isneg::Bool=false) =
+    (isneg ? -1 : 1) *
+    (significand) *
+    (2.0^(1 - exponent_bias(nexpbits) - nsigbits))
+
 end # module IEEEFloats
