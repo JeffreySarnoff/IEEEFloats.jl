@@ -11,7 +11,15 @@ export bitwidth, signbit, sign, precision, exponent, significand,
 
 import Base.Math.IEEEFloat
 import Base.Math: precision, significand_bits, exponent_bits
+import Base: signed, unsigned
 
+signed(::Type{Float64}) = Int64
+signed(::Type{Float32}) = Int32
+signed(::Type{Float16}) = Int16
+
+unsigned(::Type{Float64}) = UInt64
+unsigned(::Type{Float32}) = UInt32
+unsigned(::Type{Float16}) = UInt16
 
 @inline bitwidth(::Type{T}) where T<:IEEEFloat = sizeof(T) * 8
 
@@ -39,13 +47,13 @@ import Base.Math: precision, significand_bits, exponent_bits
 
 @inline exponentbias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
 
-@inline exponentfieldmax(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(convert(Signed, T))
+@inline exponentfieldmax(::Type{T}) where T<:IEEEFloat = exponent_max(T) + one(signed(T))
 
 # field[s] offset (shift by)
 
-@inline sign_field_offset(::Type{T}) where T<:IEEEFloat = bitwidth(T) - one(convert(Signed, T))
+@inline sign_field_offset(::Type{T}) where T<:IEEEFloat = bitwidth(T) - one(signed(T))
 @inline exponent_field_offset(::Type{T}) where T<:IEEEFloat = sign_field_offset(T) - exponent_bits(T)
-@inline significand_field_offset(::Type{T}) where T<:IEEEFloat = zero(convert(Signed, T))
+@inline significand_field_offset(::Type{T}) where T<:IEEEFloat = zero(signed(T))
 @inline sign_and_exponent_fields_offset(::Type{T}) where T<:IEEEFloat = exponent_field_offset(T)
 @inline exponent_and_significand_fields_offset(::Type{T}) where T<:IEEEFloat = significand_field_offset(T)
 
