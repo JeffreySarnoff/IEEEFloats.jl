@@ -143,7 +143,8 @@ const bias128 = 16_383 # 15 bits
 const bias64 = exponent_bias(exponent_bits(Float64)) # 1023
 const bias32 = exponent_bias(exponent_bits(Float32)) # 127
 const bias16 = exponent_bias(exponent_bits(Float16)) # 15
-
+const bias8 = exponent_bias(3) # 3
+              
 exponent_bias(nexpbits) = 2^(nexpbits-1) -1
 unbiased_exponent(nexpbits, biasedexp) = biasedexp - exponent_bias(nexpbits)
 biased_exponent(nexpbits, unbiasedexp) = unbiasedexp + exponent_bias(nexpbits)
