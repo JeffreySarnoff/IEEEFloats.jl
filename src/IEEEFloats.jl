@@ -7,25 +7,37 @@ export bitwidth, signbit, sign, precision, exponent, significand,
        get_sign_and_exponent_fields, get_exponent_and_significand_fields,
        set_sign_field, set_exponent_field, set_signficand_field,
        set_sign_and_exponent_fields, set_exponent_and_significand_fields,
-       IEEEFloat
+       IEEEFloat, ieeefloat
 
-using Base: signed, unsigned
-using Base.Math: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
+using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask,
+            signed, unsigned
 
-Base.signed(::Type{Float64}) = Int64
-Base.signed(::Type{Float32}) = Int32
-Base.signed(::Type{Float16}) = Int16
+ieeefloat(::Type{Float64}) = Float64
+ieeefloat(::Type{Float32}) = Float32
+ieeefloat(::Type{Float16}) = Float16
+ieeefloat(::Type{UInt64}) = Float64
+ieeefloat(::Type{UInt32}) = Float32
+ieeefloat(::Type{UInt16}) = Float16
+ieeefloat(::Type{Int64}) = Float64
+ieeefloat(::Type{Int32}) = Float32
+ieeefloat(::Type{Int16}) = Float16
 
 Base.unsigned(::Type{Float64}) = UInt64
 Base.unsigned(::Type{Float32}) = UInt32
 Base.unsigned(::Type{Float16}) = UInt16
 
-Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
-Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
-Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
-Base.convert(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
-Base.convert(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
-Base.convert(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
+Base.unsigned(x::Float64) = reinterpret(UInt64, x)
+Base.unsigned(x::Float32) = reinterpret(UInt32, x)
+Base.unsigned(x::Float16) = reinterpret(UInt16, x)
+
+Base.signed(::Type{Float64}) = Int64
+Base.signed(::Type{Float32}) = Int32
+Base.signed(::Type{Float16}) = Int16
+
+Base.signed(x::Float64) = reinterpret(Int64, x)
+Base.signed(x::Float32) = reinterpret(Int32, x)
+Base.signed(x::Float16) = reinterpret(Int16, x)
+
 
 bitwidth(::Type{T}) where {T} = sizeof(T) * 8
 
@@ -49,8 +61,8 @@ exponentfieldmax(::Type{T}) where T<:IEEEFloat = 2^exponent_bits(T) - 1
 
 # field[s] filter and mask
 
-@inline sign_field_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> 1
-@inline sign_and_exponent_fields_filter(::Type{T}) where T<:IEEEFloat = ~(zero(convert(Unsigned,T))) >>> (exponent_bits(T) + 1)
+@inline sign_field_filter(::Type{T}) where T<:IEEEFloat = ~(zero(unsigned(T)) >>> 1
+@inline sign_and_exponent_fields_filter(::Type{T}) where T<:IEEEFloat = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
 @inline exponent_field_filter(::Type{T}) where T<:IEEEFloat = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
 @inline significand_field_filter(::Type{T}) where T<:IEEEFloat = ~sign_and_exponent_fields_filter(T)
 @inline exponent_and_significand_fields_filter(::Type{T}) where T<:IEEEFloat = ~(sign_field_filter(T))
