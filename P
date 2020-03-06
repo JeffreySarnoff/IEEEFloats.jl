@@ -1,0 +1,6 @@
+name = "IEEEFloats"
+uuid = "fa1f7535-4483-49bf-a10f-ff859e69a43f"
+author = "Jeffrey Sarnoff <jeffrey.sarnoff@gmail.com>"
+
+[compat]
+julia = "1"
