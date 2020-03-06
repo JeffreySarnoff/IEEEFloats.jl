@@ -1,6 +1,7 @@
 module IEEEFloats
 
-export bitwidth, signbit, sign, precision, exponent, significand,
+export ieeefloat, bitwidth, 
+       signbit, sign, precision, exponent, significand,
        exponentmax, exponentmin, exponentfieldmax,
        intfloatmax, intfloatmin, floatintmax, floatintmin,
        get_sign_field, get_exponent_field, get_signficand_field,
@@ -12,44 +13,29 @@ export bitwidth, signbit, sign, precision, exponent, significand,
 using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask,
             signed, unsigned
 
-ieeefloat(::Type{Float64}) = Float64
-ieeefloat(::Type{Float32}) = Float32
-ieeefloat(::Type{Float16}) = Float16
-ieeefloat(::Type{UInt64}) = Float64
-ieeefloat(::Type{UInt32}) = Float32
-ieeefloat(::Type{UInt16}) = Float16
-ieeefloat(::Type{Int64}) = Float64
-ieeefloat(::Type{Int32}) = Float32
-ieeefloat(::Type{Int16}) = Float16
+# `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
 
-Base.unsigned(::Type{Float64}) = UInt64
-Base.unsigned(::Type{Float32}) = UInt32
-Base.unsigned(::Type{Float16}) = UInt16
+include("support_more_types.jl")  # Float128, Float8
+include("corresponding_sizes.jl") # ieeefloat(xT), unsigned(xT), signed(xT)
 
-Base.unsigned(x::Float64) = reinterpret(UInt64, x)
-Base.unsigned(x::Float32) = reinterpret(UInt32, x)
-Base.unsigned(x::Float16) = reinterpret(UInt16, x)
+bitwidth(::Type{T}) where T = sizeof(T) * 8
 
-Base.signed(::Type{Float64}) = Int64
-Base.signed(::Type{Float32}) = Int32
-Base.signed(::Type{Float16}) = Int16
+exponent_bias(n_exponent_bits) = 2^(n_exponent_bits - 1) - 1
+exponent_bias(::Type{T}) where T = exponent_bias(exponent_bits(T))
 
-Base.signed(x::Float64) = reinterpret(Int64, x)
-Base.signed(x::Float32) = reinterpret(Int32, x)
-Base.signed(x::Float16) = reinterpret(Int16, x)
+# unbiased_exponent_max(T) == exponent_bias(T)
+unbiased_exponent_max(::Type{T}) where T = 2^(exponent_bits(T) - 1) - 1  # for normal values
+unbiased_exponent_min(::Type{T}) where T = 1 - exponent_max(T)           # for normal values
+
+biased_exponent_max(::Type{T}) where T = 2^(exponent_bits(T)) - 1  
+biased_exponent_min(::Type{T}) where T = 0
+
+exponent_biasing(::Type{T}, unbiased) where T = unbiased + exponent_bias(T)
+exponent_unbiasing(::Type{T}, biased) where T = biased - exponent_bias(T)
 
 
-bitwidth(::Type{T}) where {T} = sizeof(T) * 8
 
-exponentmax(::Type{T}) where T =   2^(exponent_bits(T) - 1) - 1  # normal values
-exponentmin(::Type{T}) where T =  1 - exponentmax(T)             # normal values
 
-biased_exponentmax(::Type{T}) where T = 2^(exponent_bits(T)) - 1  
-biased_exponentmin(::Type{T}) where T = 0
-
-exponentbias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
-
-exponentfieldmax(::Type{T}) where T<:IEEEFloat = 2^exponent_bits(T) - 1
 
 # field[s] offset (shift by)
 
@@ -136,18 +122,6 @@ end
 
 # ============== #
 
-exponent_bias(::Type{T}) = 2^(exponent_bits(T) - 1) - 1
-
-
-const bias128 = 16_383 # 15 bits
-const bias64 = exponent_bias(exponent_bits(Float64)) # 1023
-const bias32 = exponent_bias(exponent_bits(Float32)) # 127
-const bias16 = exponent_bias(exponent_bits(Float16)) # 15
-const bias8 = exponent_bias(3) # 3
-              
-exponent_bias(nexpbits) = 2^(nexpbits-1) -1
-unbiased_exponent(nexpbits, biasedexp) = biasedexp - exponent_bias(nexpbits)
-biased_exponent(nexpbits, unbiasedexp) = unbiasedexp + exponent_bias(nexpbits)
 
 decode_normal_value(nexpbits, nsigbits, significand, unbiasedexponent=0, isneg::Bool=false) =
     (isneg ? -1 : 1) *
@@ -158,4 +132,24 @@ decode_subnormal_value(nexpbits, nsigbits, significand, unbiasedexponent=0, isne
     (significand) *
     (2.0^(1 - exponent_bias(nexpbits) - nsigbits))
 
+              
+              
+              
+ #=
+const bias128 = 16_383 # 15 bits
+const bias64 = exponent_bias(exponent_bits(Float64)) # 1023
+const bias32 = exponent_bias(exponent_bits(Float32)) # 127
+const bias16 = exponent_bias(exponent_bits(Float16)) # 15
+const bias8 = exponent_bias(3) # 3
+  
+exponent_bias(::Type{T}) where T<:IEEEFloat = exponent_max(T)
+exponent_max(::Type{T}) where T =   2^(exponent_bits(T) - 1) - 1  # normal values
+exponent_min(::Type{T}) where T =  1 - exponent_max(T)             # normal values
+
+biased_exponentmax(::Type{T}) where T = 2^(exponent_bits(T)) - 1  
+biased_exponentmin(::Type{T}) where T = 0
+=#
+             
+              
+              
 end # module IEEEFloats
