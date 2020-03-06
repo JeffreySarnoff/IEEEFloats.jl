@@ -112,9 +112,9 @@ exponent_bias(::Type{T}) = 2^(exponent_bits(T) - 1) - 1
 
 
 const bias128 = 16_383 # 15 bits
-const bias64 = exponent_bias(Float64) # 1023
-const bias32 = exponent_bias(Float64) # 127
-const bias16 = exponent_bias(Float64) # 15
+const bias64 = exponent_bias(exponent_bits(Float64)) # 1023
+const bias32 = exponent_bias(exponent_bits(Float32)) # 127
+const bias16 = exponent_bias(exponent_bits(Float16)) # 15
 
 exponent_bias(nexpbits) = 2^(nexpbits-1) -1
 unbiased_exponent(nexpbits, biasedexp) = biasedexp - exponent_bias(nexpbits)
