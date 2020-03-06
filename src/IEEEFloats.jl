@@ -20,6 +20,13 @@ Base.unsigned(::Type{Float64}) = UInt64
 Base.unsigned(::Type{Float32}) = UInt32
 Base.unsigned(::Type{Float16}) = UInt16
 
+Base.convert(::Type{Unsigned}, ::Type{Float64}) = UInt64
+Base.convert(::Type{Unsigned}, ::Type{Float32}) = UInt32
+Base.convert(::Type{Unsigned}, ::Type{Float16}) = UInt16
+Base.convert(::Type{Unsigned}, x::Float64) = reinterpret(UInt64, x)
+Base.convert(::Type{Unsigned}, x::Float32) = reinterpret(UInt32, x)
+Base.convert(::Type{Unsigned}, x::Float16) = reinterpret(UInt16, x)
+
 bitwidth(::Type{T}) where {T} = sizeof(T) * 8
 
 exponentmax(::Type{T}) where T =   2^(exponent_bits(T) - 1) - 1  # normal values
@@ -61,7 +68,7 @@ exponentfieldmax(::Type{T}) where T<:IEEEFloat = 2^exponent_bits(T) - 1
 @inline exponent_and_significand_fields_mask_lsbs(::Type{T}) where T<:IEEEFloat = exponent_and_significand_fields_mask(T) >> significand_field_offset(T)
 
 # isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
-
+       
 @inline sign_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & sign_field_mask(T)
 @inline exponent_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & exponent_field_mask(T)
 @inline significand_field(x::T) where T<:IEEEFloat = convert(Unsigned, x) & significand_field_mask(T)
@@ -93,6 +100,15 @@ exponentfieldmax(::Type{T}) where T<:IEEEFloat = 2^exponent_bits(T) - 1
 @inline set_significand_field(x::T) where T<:Unsigned = (x & significand_field_mask_lsbs(T)) << significand_field_offset(T)
 @inline set_sign_and_exponent_fields(x::T) where T<:Unsigned = (x & sign_and_exponent_fields_mask_lsbs(T)) << exponent_field_offset(T)
 @inline set_exponent_and_significand_fields(x::T) where T<:Unsigned = (x & exponent_and_significand_fields_mask_lsbs(T)) << exponent_and_significand_fields_offset(T)
+
+# fetch the field[s] into the low order bits of a Float
+
+@inline get_sign_field(x::T) where T<:Base.IEEEFloat = sign_field(x) >> sign_field_offset(T)
+@inline get_exponent_field(x::T) where T<:Base.IEEEFloat = exponent_field(x) >> exponent_field_offset(T)
+@inline get_significand_field(x::T) where T<:Base.IEEEFloat = significand_field(x) >> significand_field_offset(T)
+@inline get_sign_and_exponent_fields(x::T) where T<:Base.IEEEFloat = sign_and_exponent_fields(x) >> exponent_field_offset(T)
+@inline get_exponent_and_significand_fields(x::T) where T<:Base.IEEEFloat = exponent_and_significand_fields(x) >> significand_field_offset(T)
+
 
 # set field[s]: set_sign_field(1.0, 1%UInt64) == -1.0
 
