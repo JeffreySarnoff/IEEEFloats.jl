@@ -15,9 +15,9 @@ using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_m
 if isdefined(Base, :significand_bits)
     using Base: significand_bits
 else
-    significand_bits(Type{Float64}) = 52
-    significand_bits(Type{Float32}) = 23
-    significand_bits(Type{Float16}) = 10
+    significand_bits(::Type{Float64}) = 52
+    significand_bits(::Type{Float32}) = 23
+    significand_bits(::Type{Float16}) = 10
  end       
 
 # `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
