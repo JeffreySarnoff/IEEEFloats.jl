@@ -1,26 +1,4 @@
 
-# field[s] offset (shift by)
-
-sign_offset(::Type{T}) where T = bitwidth(T) - one(signed(T))
-exponent_offset(::Type{T}) where T = sign_offset(T) - exponent_bits(T)
-significand_offset(::Type{T}) where T = zero(signed(T))
-sign_exponent_offset(::Type{T}) where T = exponent_offset(T)
-exponent_significand_offset(::Type{T}) where T = significand_offset(T)
-
-# field[s] filter and mask
-
-sign_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> 1
-sign_exponent_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
-exponent_filter(::Type{T}) where T = sign_exponent_filter(T) | sign_mask(T)
-significand_filter(::Type{T}) where T = ~sign_exponent_filter(T)
-exponent_significand_filter(::Type{T}) where T = ~(sign_filter(T))
-
-sign_mask(::Type{T}) where T = ~sign_filter(T)
-sign_exponent_mask(::Type{T}) where T = ~sign_exponent_filter(T)
-exponent_mask(::Type{T}) where T = ~exponent_filter(T)
-significand_mask(::Type{T}) where T = ~sign_exponent_mask(T)
-exponent_significand_mask(::Type{T}) where T = ~exponent_significand_mask(T)
-
 # isolate the field from other bits 
 # (yields the field value, as Unsigned bits in place)
    
@@ -58,15 +36,35 @@ set_sign_exponent_field(x::T) where T<:Unsigned = (x & sign_exponent_mask_lsbs(T
 set_exponent_significand_field(x::T) where T<:Unsigned = (x & exponent_significand_mask_lsbs(T)) << exponent_significand_offset(T)
 
 
-              
-# set field[s]: set_sign_field(1.0, 1%UInt64) == -1.0
+# field offsets (shift by)
 
-for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filter_exponent_field),
-              (:set_significand_field, :filter_exponent_field), (:set_sign_exponent_field, :filter_sign_exponent_field),
-              (:set_exponent_significand_field, :filter_exponent_significand_field))
-  for (T,U) in ((:Float64, :UInt64), (:Float32, :UInt32), (:Float16, :UInt16))
-    @eval begin
-         $S(x::$T, y::$U) = convert($T, $F(convert($U, x)) | $S(y))
-    end
-  end
-end
+sign_offset(::Type{T}) where T = bitwidth(T) - one(signed(T))
+exponent_offset(::Type{T}) where T = sign_offset(T) - exponent_bits(T)
+significand_offset(::Type{T}) where T = zero(signed(T))
+sign_exponent_offset(::Type{T}) where T = exponent_offset(T)
+exponent_significand_offset(::Type{T}) where T = significand_offset(T)
+
+# field filters
+
+sign_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> 1
+sign_exponent_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
+exponent_filter(::Type{T}) where T = sign_exponent_filter(T) | sign_mask(T)
+significand_filter(::Type{T}) where T = ~sign_exponent_filter(T)
+exponent_significand_filter(::Type{T}) where T = ~(sign_filter(T))
+
+# field masks
+
+sign_mask(::Type{T}) where T = ~sign_filter(T)
+sign_exponent_mask(::Type{T}) where T = ~sign_exponent_filter(T)
+exponent_mask(::Type{T}) where T = ~exponent_filter(T)
+significand_mask(::Type{T}) where T = ~sign_exponent_mask(T)
+exponent_significand_mask(::Type{T}) where T = ~exponent_significand_mask(T)
+
+# place plain masks in the least significant bits
+
+sign_mask_lsbs(::Type{T}) where T = sign_mask(T) >> sign_offset(T)
+sign_exponent_mask_lsbs(::Type{T}) where T = sign_exponent_mask(T) >> exponent_offset(T)
+exponent_mask_lsbs(::Type{T}) where T = exponent_mask(T) >> exponent_offset(T)
+significand_mask_lsbs(::Type{T}) where T = significand_mask(T) >> significand_offset(T)
+exponent_significand_mask_lsbs(::Type{T}) where T = exponent_significand_mask(T) >> significand_offset(T)
+
