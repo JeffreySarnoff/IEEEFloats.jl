@@ -1,4 +1,4 @@
-## IEEE754-2008 conformant constants for Float8, Float16, Float32, Float64, Float128
+### IEEE754-2019 conformant constants for Float8, Float16, Float32, Float64, Float128
 
 ```julia
 
