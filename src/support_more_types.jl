@@ -16,13 +16,13 @@ This placeholder is used to reference related constants.
 This placeholder is used to reference related constants.
 """ Binary8
 
-if !isdefined(:Float128)
+if !isdefined(Main, :Float128)
     primitive type Float128 <: AbstractFloat 128 end
 end
-if !isdefined(:Float128)
+if !isdefined(Main, :Float128)
     primitive type Float8   <: AbstractFloat 8 end
 end
-if !isdefined(:Binary8)
+if !isdefined(Main, :Binary8)
     primitive type Binary8  <: AbstractFloat 8 end
 end
 
