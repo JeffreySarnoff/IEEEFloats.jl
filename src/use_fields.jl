@@ -1,6 +1,5 @@
-
-# isolate the field from other bits 
-# (yields the field value, as Unsigned bits in place)
+# isolate the field in place 
+# (yields the field value, other bits are zeroed)
    
 isolate_sign_field(x::T) where T = unsigned(x) & sign_mask(T)
 isolate_exponent_field(x::T) where T = unsigned(x) & exponent_mask(T)
@@ -10,7 +9,7 @@ isolate_exponent_significand_field(x::T) where T = unsigned(x) & sign_filter(T)
 isolate_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
 # clear the field in place
-# (yields the other fields, as unsigned bits)
+# (yields the other fields, this field is zeroed)
 
 clear_sign_field(x::T) where T = unsigned(x) & sign_filter(T)
 clear_exponent_field(x::T) where T = unsigned(x) & exponent_filter(T)
@@ -20,6 +19,7 @@ clear_exponent_significand_field(x::T) where T = unsigned(x) & exponent_signific
 clear_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
 # fetch the field into the low order bits
+# all other bits are zeroed
 
 get_sign_field(x::T) where T = isolate_sign_field(x) >> sign_offset(T)
 get_exponent_field(x::T) where T = isolate_exponent_field(x) >> exponent_offset(T)
@@ -27,14 +27,14 @@ get_significand_field(x::T) where T = isolate_significand_field(x) >> significan
 get_sign_exponent_field(x::T) where T = isolate_sign_exponent_field(x) >> exponent_offset(T)
 get_exponent_significand_field(x::T) where T = isolate_exponent_significand_field(x) >> significand_offset(T)
 
-# prepare field in low order bits, shift field into its place
+# prepared field is in the low order bits, shift field into its place
+# all other bits are zeroed
 
-set_sign_field(x::T) where T<:Unsigned = (x & sign_mask_lsbs(T)) << sign_offset(T)
-set_exponent_field(x::T) where T<:Unsigned = (x & exponent_mask_lsbs(T)) << exponent_offset(T)
-set_significand_field(x::T) where T<:Unsigned = (x & significand_mask_lsbs(T)) << significand_offset(T)
-set_sign_exponent_field(x::T) where T<:Unsigned = (x & sign_exponent_mask_lsbs(T)) << exponent_offset(T)
-set_exponent_significand_field(x::T) where T<:Unsigned = (x & exponent_significand_mask_lsbs(T)) << exponent_significand_offset(T)
-
+set_sign_field(x::T) where T = (x & sign_mask_lsbs(T)) << sign_offset(T)
+set_exponent_field(x::T) where T = (x & exponent_mask_lsbs(T)) << exponent_offset(T)
+set_significand_field(x::T) where T = (x & significand_mask_lsbs(T)) << significand_offset(T)
+set_sign_exponent_field(x::T) where T = (x & sign_exponent_mask_lsbs(T)) << exponent_offset(T)
+set_exponent_significand_field(x::T) where T = (x & exponent_significand_mask_lsbs(T)) << exponent_significand_offset(T)
 
 # field offsets (shift by)
 
