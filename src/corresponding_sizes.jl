@@ -1,28 +1,4 @@
 """
-    ieeefloat(T)
-
-Obtain the IEEEFloat type with the same number of bits as T.
-""" ieeefloat
-
-ieeefloat(::Type{Float128}) = Float128
-ieeefloat(::Type{Float64}) = Float64
-ieeefloat(::Type{Float32}) = Float32
-ieeefloat(::Type{Float16}) = Float16
-ieeefloat(::Type{Float8}) = Float8
-
-ieeefloat(::Type{UInt128}) = Float128
-ieeefloat(::Type{UInt64}) = Float64
-ieeefloat(::Type{UInt32}) = Float32
-ieeefloat(::Type{UInt16}) = Float16
-ieeefloat(::Type{UInt8}) = Float8
-
-ieeefloat(::Type{Int128}) = Float128
-ieeefloat(::Type{Int64}) = Float64
-ieeefloat(::Type{Int32}) = Float32
-ieeefloat(::Type{Int16}) = Float16
-ieeefloat(::Type{Int8}) = Float8
-
-"""
     unsigned(T)
     unsigned(x::T)
 
@@ -35,6 +11,12 @@ Obtain the unsigned type or unsigned value that corresponds.
 
 Obtain the signed type or signed value that corresponds.
 """ signed
+
+"""
+    ieeefloat(T)
+
+Obtain the IEEEFloat type with the same number of bits as T.
+""" ieeefloat
 
 
 Base.unsigned(::Type{Float128}) = UInt128
@@ -61,3 +43,14 @@ Base.signed(x::Float32) = reinterpret(Int32, x)
 Base.signed(x::Float16) = reinterpret(Int16, x)
 Base.signed(x::Float8) = reinterpret(Int8, x)
 
+ieeefloat(::Type{UInt128}) = Float128
+ieeefloat(::Type{UInt64}) = Float64
+ieeefloat(::Type{UInt32}) = Float32
+ieeefloat(::Type{UInt16}) = Float16
+ieeefloat(::Type{UInt8}) = Float8
+
+ieeefloat(::Type{Int128}) = Float128
+ieeefloat(::Type{Int64}) = Float64
+ieeefloat(::Type{Int32}) = Float32
+ieeefloat(::Type{Int16}) = Float16
+ieeefloat(::Type{Int8}) = Float8
