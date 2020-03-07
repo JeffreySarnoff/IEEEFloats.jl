@@ -26,7 +26,7 @@ function StandardFloat(::Type{T}, bits::FloatBits) where T
    return StandardFloat{Nothing}(T, bits)
 end
 
-function register_ieeefloat(stdfloat::StandardFloat{T,R}) where {T,R}
+function register_ieeefloat(stdfloat::StandardFloat{F}) where {F}
 end
 
 """
