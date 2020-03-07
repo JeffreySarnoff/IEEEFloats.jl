@@ -63,9 +63,21 @@
 
 # fetch the field[s] into the low order bits of a Float
 
-@inline get_sign_field(x::T) where T<:Base.IEEEFloat = sign_field(x) >> sign_field_offset(T)
-@inline get_exponent_field(x::T) where T<:Base.IEEEFloat = exponent_field(x) >> exponent_field_offset(T)
-@inline get_significand_field(x::T) where T<:Base.IEEEFloat = significand_field(x) >> significand_field_offset(T)
-@inline get_sign_and_exponent_fields(x::T) where T<:Base.IEEEFloat = sign_and_exponent_fields(x) >> exponent_field_offset(T)
-@inline get_exponent_and_significand_fields(x::T) where T<:Base.IEEEFloat = exponent_and_significand_fields(x) >> significand_field_offset(T)
+@inline get_sign_field(x::T) where T = sign_field(x) >> sign_field_offset(T)
+@inline get_exponent_field(x::T) where T = exponent_field(x) >> exponent_field_offset(T)
+@inline get_significand_field(x::T) where T = significand_field(x) >> significand_field_offset(T)
+@inline get_sign_and_exponent_fields(x::T) where T = sign_and_exponent_fields(x) >> exponent_field_offset(T)
+@inline get_exponent_and_significand_fields(x::T) where T = exponent_and_significand_fields(x) >> significand_field_offset(T)
 
+              
+# set field[s]: set_sign_field(1.0, 1%UInt64) == -1.0
+
+for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filter_exponent_field),
+              (:set_significand_field, :filter_exponent_field), (:set_sign_and_exponent_fields, :filter_sign_and_exponent_fields),
+              (:set_exponent_and_significand_fields, :filter_exponent_and_significand_fields))
+  for (T,U) in ((:Float64, :UInt64), (:Float32, :UInt32), (:Float16, :UInt16))
+    @eval begin
+        @inline $S(x::$T, y::$U) = convert($T, $F(convert($U, x)) | $S(y))
+    end
+  end
+end
