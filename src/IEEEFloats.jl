@@ -9,16 +9,11 @@ export IEEEFloat, ieeefloat,
        get_sign, get_exponent, get_signficand,
        set_sign, set_exponent, set_signficand
  
-using Base: IEEEFloat, precision, exponent_bits, significand_mask, exponent_mask
-# Base: signed, unsigned, maxintfloat
+using Base: IEEEFloat, precision, significand_mask, exponent_mask
 
-if isdefined(Base, :significand_bits)
-    using Base: significand_bits
-else
-    significand_bits(::Type{Float64}) = 52
-    significand_bits(::Type{Float32}) = 23
-    significand_bits(::Type{Float16}) = 10
- end       
+
+# compat for Julia v1.0.5 Base: exponent_bits, signnificand_bits
+include("v105compatible.jl")
 
 # `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
 
