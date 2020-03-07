@@ -9,7 +9,7 @@ export IEEEFloat, ieeefloat,
        get_sign, get_exponent, get_signficand,
        set_sign, set_exponent, set_signficand
  
-using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
+using Base: IEEEFloat, precision, exponent_bits, significand_mask, exponent_mask
 # Base: signed, unsigned, maxintfloat
 
 if isdefined(Base, :significand_bits)
