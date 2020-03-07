@@ -1,4 +1,3 @@
-
 # fetch the field into the low order bits
 # all other bits are zeroed
 
