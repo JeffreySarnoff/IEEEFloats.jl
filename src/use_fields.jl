@@ -1,83 +1,88 @@
 
 # field[s] offset (shift by)
 
-@inline sign_field_offset(::Type{T}) where T = bitwidth(T) - one(signed(T))
-@inline exponent_field_offset(::Type{T}) where T = sign_field_offset(T) - exponent_bits(T)
-@inline significand_field_offset(::Type{T}) where T = zero(signed(T))
-@inline sign_and_exponent_fields_offset(::Type{T}) where T = exponent_field_offset(T)
-@inline exponent_and_significand_fields_offset(::Type{T}) where T = significand_field_offset(T)
+sign_offset(::Type{T}) where T = bitwidth(T) - one(signed(T))
+exponent_offset(::Type{T}) where T = sign_offset(T) - exponent_bits(T)
+significand_offset(::Type{T}) where T = zero(signed(T))
+sign_exponent_offset(::Type{T}) where T = exponent_offset(T)
+exponent_significand_offset(::Type{T}) where T = significand_offset(T)
 
 # field[s] filter and mask
 
-@inline sign_field_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> 1
-@inline sign_and_exponent_fields_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
-@inline exponent_field_filter(::Type{T}) where T = sign_and_exponent_fields_filter(T) | sign_field_mask(T)
-@inline significand_field_filter(::Type{T}) where T = ~sign_and_exponent_fields_filter(T)
-@inline exponent_and_significand_fields_filter(::Type{T}) where T = ~(sign_field_filter(T))
+sign_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> 1
+sign_exponent_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
+exponent_filter(::Type{T}) where T = sign_exponent_filter(T) | sign_mask(T)
+significand_filter(::Type{T}) where T = ~sign_exponent_filter(T)
+exponent_significand_filter(::Type{T}) where T = ~(sign_filter(T))
 
-@inline sign_field_mask(::Type{T}) where T = ~sign_field_filter(T)
-@inline sign_and_exponent_fields_mask(::Type{T}) where T = ~sign_and_exponent_fields_filter(T)
-@inline exponent_field_mask(::Type{T}) where T = ~exponent_field_filter(T)
-@inline significand_field_mask(::Type{T}) where T = ~sign_and_exponent_fields_mask(T)
-@inline exponent_and_significand_fields_mask(::Type{T}) where T = ~exponent_and_significand_fields_mask(T)
+sign_mask(::Type{T}) where T = ~sign_filter(T)
+sign_exponent_mask(::Type{T}) where T = ~sign_exponent_filter(T)
+exponent_mask(::Type{T}) where T = ~exponent_filter(T)
+significand_mask(::Type{T}) where T = ~sign_exponent_mask(T)
+exponent_significand_mask(::Type{T}) where T = ~exponent_significand_mask(T)
 
-@inline sign_field_mask_lsbs(::Type{T}) where T = sign_field_mask(T) >> sign_field_offset(T)
-@inline sign_and_exponent_fields_mask_lsbs(::Type{T}) where T = sign_and_exponent_fields_mask(T) >> exponent_field_offset(T)
-@inline exponent_field_mask_lsbs(::Type{T}) where T = exponent_field_mask(T) >> exponent_field_offset(T)
-@inline significand_field_mask_lsbs(::Type{T}) where T = significand_fields_mask(T) >> significand_field_offset(T)
-@inline exponent_and_significand_fields_mask_lsbs(::Type{T}) where T = exponent_and_significand_fields_mask(T) >> significand_field_offset(T)
+# place the masks into the least significant bits
 
-# isolate the field[s] from other bits and yield the field value, as Unsigned bits in place
-       
-@inline sign_field(x::T) where T = convert(Unsigned, x) & sign_field_mask(T)
-@inline exponent_field(x::T) where T = convert(Unsigned, x) & exponent_field_mask(T)
-@inline significand_field(x::T) where T = convert(Unsigned, x) & significand_field_mask(T)
-@inline sign_and_exponent_fields(x::T) where T = convert(Unsigned, x) & sign_and_exponent_field_mask(T)
-@inline exponent_and_significand_fields(x::T) where T = convert(Unsigned, x) & sign_field_filter(T)
-@inline sign_and_significand_fields(x::T) where T = convert(Unsigned, x) & exponent_field_mask(T)
+sign_mask_lsbs(::Type{T}) where T = sign_mask(T) >> sign_offset(T)
+sign_exponent_mask_lsbs(::Type{T}) where T = sign_exponent_mask(T) >> exponent_offset(T)
+exponent_mask_lsbs(::Type{T}) where T = exponent_mask(T) >> exponent_offset(T)
+significand_mask_lsbs(::Type{T}) where T = significand_mask(T) >> significand_offset(T)
+exponent_significand_mask_lsbs(::Type{T}) where T = exponent_significand_mask(T) >> significand_offset(T)
 
-# clear the field[s] and yield the value, as Unsigned bits in place
+# isolate the field from other bits 
+# (yields the field value, as Unsigned bits in place)
+   
+isolate_sign_field(x::T) where T = unsigned(x) & sign_mask(T)
+isolate_exponent_field(x::T) where T = unsigned(x) & exponent_mask(T)
+isolate_significand_field(x::T) where T = unsigned(x) & significand_mask(T)
+isolate_sign_exponent_field(x::T) where T = unsigned(x) & sign_exponent_mask(T)
+isolate_exponent_significand_field(x::T) where T = unsigned(x) & sign_filter(T)
+isolate_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
-@inline clear_sign_field(x::T) where T = convert(Unsigned, x) & sign_field_filter(T)
-@inline clear_exponent_field(x::T) where T = convert(Unsigned, x) & exponent_field_filter(T)
-@inline clear_significand_field(x::T) where T = convert(Unsigned, x) & significand_field_filter(T)
-@inline clear_sign_and_exponent_fields(x::T) where T = convert(Unsigned, x) & sign_and_exponent_field_filter(T)
-@inline clear_exponent_and_significand_fields(x::T) where T = convert(Unsigned, x) & exponent_and_significand_fields_filter(T)
-@inline clear_sign_and_significand_fields(x::T) where T = convert(Unsigned, x) & exponent_field_mask(T)
+# clear the field in place
+# (yields the other fields, as unsigned bits)
+
+clear_sign_field(x::T) where T = unsigned(x) & sign_filter(T)
+clear_exponent_field(x::T) where T = unsigned(x) & exponent_filter(T)
+clear_significand_field(x::T) where T = unsigned(x) & significand_filter(T)
+clear_sign_exponent_field(x::T) where T = unsigned(x) & sign_exponent_filter(T)
+clear_exponent_significand_field(x::T) where T = unsigned(x) & exponent_significand_filter(T)
+clear_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
 # fetch the field[s] into the low order bits of an Unsigned
 
-@inline get_sign_field(x::T) where T<:Unsigned = sign_field(x) >> sign_field_offset(T)
-@inline get_exponent_field(x::T) where T<:Unsigned = exponent_field(x) >> exponent_field_offset(T)
-@inline get_significand_field(x::T) where T<:Unsigned = significand_field(x) >> significand_field_offset(T)
-@inline get_sign_and_exponent_fields(x::T) where T<:Unsigned = sign_and_exponent_fields(x) >> exponent_field_offset(T)
-@inline get_exponent_and_significand_fields(x::T) where T<:Unsigned = exponent_and_significand_fields(x) >> significand_field_offset(T)
-
-# prepare Unsigned low order bits to occupy field[s]
-
-@inline set_sign_field(x::T) where T<:Unsigned = (x & sign_field_mask_lsbs(T)) << sign_field_offset(T)
-@inline set_exponent_field(x::T) where T<:Unsigned = (x & exponent_field_mask_lsbs(T)) << exponent_field_offset(T)
-@inline set_significand_field(x::T) where T<:Unsigned = (x & significand_field_mask_lsbs(T)) << significand_field_offset(T)
-@inline set_sign_and_exponent_fields(x::T) where T<:Unsigned = (x & sign_and_exponent_fields_mask_lsbs(T)) << exponent_field_offset(T)
-@inline set_exponent_and_significand_fields(x::T) where T<:Unsigned = (x & exponent_and_significand_fields_mask_lsbs(T)) << exponent_and_significand_fields_offset(T)
+get_sign_field(x::T) where T<:Unsigned = sign_field(x) >> sign_offset(T)
+get_exponent_field(x::T) where T<:Unsigned = exponent_field(x) >> exponent_offset(T)
+get_significand_field(x::T) where T<:Unsigned = significand_field(x) >> significand_offset(T)
+get_sign_exponent_field(x::T) where T<:Unsigned = sign_exponent_field(x) >> exponent_offset(T)
+get_exponent_significand_field(x::T) where T<:Unsigned = exponent_significand_field(x) >> significand_offset(T)
 
 # fetch the field[s] into the low order bits of a Float
 
-@inline get_sign_field(x::T) where T = sign_field(x) >> sign_field_offset(T)
-@inline get_exponent_field(x::T) where T = exponent_field(x) >> exponent_field_offset(T)
-@inline get_significand_field(x::T) where T = significand_field(x) >> significand_field_offset(T)
-@inline get_sign_and_exponent_fields(x::T) where T = sign_and_exponent_fields(x) >> exponent_field_offset(T)
-@inline get_exponent_and_significand_fields(x::T) where T = exponent_and_significand_fields(x) >> significand_field_offset(T)
+get_sign_field(x::T) where T = isolate_sign_field(x) >> sign_offset(T)
+get_exponent_field(x::T) where T = isolate_exponent_field(x) >> exponent_offset(T)
+get_significand_field(x::T) where T = isolate_significand_field(x) >> significand_offset(T)
+get_sign_exponent_field(x::T) where T = isolate_sign_exponent_field(x) >> exponent_offset(T)
+get_exponent_significand_field(x::T) where T = isolate_exponent_significand_field(x) >> significand_offset(T)
+
+# prepare field in low order bits, shift field into its place
+
+set_sign_field(x::T) where T<:Unsigned = (x & sign_mask_lsbs(T)) << sign_offset(T)
+set_exponent_field(x::T) where T<:Unsigned = (x & exponent_mask_lsbs(T)) << exponent_offset(T)
+set_significand_field(x::T) where T<:Unsigned = (x & significand_mask_lsbs(T)) << significand_offset(T)
+set_sign_exponent_field(x::T) where T<:Unsigned = (x & sign_exponent_mask_lsbs(T)) << exponent_offset(T)
+set_exponent_significand_field(x::T) where T<:Unsigned = (x & exponent_significand_mask_lsbs(T)) << exponent_significand_offset(T)
+
 
               
 # set field[s]: set_sign_field(1.0, 1%UInt64) == -1.0
 
 for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filter_exponent_field),
-              (:set_significand_field, :filter_exponent_field), (:set_sign_and_exponent_fields, :filter_sign_and_exponent_fields),
-              (:set_exponent_and_significand_fields, :filter_exponent_and_significand_fields))
+              (:set_significand_field, :filter_exponent_field), (:set_sign_exponent_field, :filter_sign_exponent_field),
+              (:set_exponent_significand_field, :filter_exponent_significand_field))
   for (T,U) in ((:Float64, :UInt64), (:Float32, :UInt32), (:Float16, :UInt16))
     @eval begin
-        @inline $S(x::$T, y::$U) = convert($T, $F(convert($U, x)) | $S(y))
+         $S(x::$T, y::$U) = convert($T, $F(convert($U, x)) | $S(y))
     end
   end
 end
