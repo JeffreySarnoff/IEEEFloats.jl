@@ -67,3 +67,11 @@ ieeefloat(x::Int64) = reinterpret(Float64, x)
 ieeefloat(x::Int32) = reinterpret(Float32, x)
 ieeefloat(x::Int16) = reinterpret(Float16, x)
 ieeefloat(x::Int8) = reinterpret(Float8, x)
+
+bybitwidth = Dict{Int, NamedTuple{(:unsigned, :signed, :floating)}}(
+    8   => (unsigned=UInt8,   signed=Int8,   floating=isdefined(Main, :Float8) ? Float8 : UInt8),
+    16  => (unsigned=UInt16,  signed=Int16,  floating=Float16),
+    32  => (unsigned=UInt16,  signed=Int16,  floating=Float32),
+    64  => (unsigned=UInt16,  signed=Int16,  floating=Float64),
+    128 => (unsigned=UInt128, signed=Int128, floating=isdefined(Main, :Quadmath) ? Float128 : UInt128)
+)
