@@ -21,14 +21,6 @@ exponent_mask(::Type{T}) where T = ~exponent_filter(T)
 significand_mask(::Type{T}) where T = ~sign_exponent_mask(T)
 exponent_significand_mask(::Type{T}) where T = ~exponent_significand_mask(T)
 
-# place the masks into the least significant bits
-
-sign_mask_lsbs(::Type{T}) where T = sign_mask(T) >> sign_offset(T)
-sign_exponent_mask_lsbs(::Type{T}) where T = sign_exponent_mask(T) >> exponent_offset(T)
-exponent_mask_lsbs(::Type{T}) where T = exponent_mask(T) >> exponent_offset(T)
-significand_mask_lsbs(::Type{T}) where T = significand_mask(T) >> significand_offset(T)
-exponent_significand_mask_lsbs(::Type{T}) where T = exponent_significand_mask(T) >> significand_offset(T)
-
 # isolate the field from other bits 
 # (yields the field value, as Unsigned bits in place)
    
