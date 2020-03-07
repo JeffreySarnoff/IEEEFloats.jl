@@ -14,8 +14,9 @@ Obtain the signed type or signed value that corresponds.
 
 """
     ieeefloat(T)
+    ieeefloat(x::T)
 
-Obtain the IEEEFloat type with the same number of bits as T.
+Obtain the IEEEFloat type or float value with the same number of bits as T.
 """ ieeefloat
 
 
@@ -49,8 +50,20 @@ ieeefloat(::Type{UInt32}) = Float32
 ieeefloat(::Type{UInt16}) = Float16
 ieeefloat(::Type{UInt8}) = Float8
 
+ieeefloat(x::UInt128) = reinterpret(Float128, x)
+ieeefloat(x::UInt64) = reinterpret(Float64, x)
+ieeefloat(x::UInt32) = reinterpret(Float32, x)
+ieeefloat(x::UInt16) = reinterpret(Float16, x)
+ieeefloat(x::UInt8) = reinterpret(Float8, x)
+
 ieeefloat(::Type{Int128}) = Float128
 ieeefloat(::Type{Int64}) = Float64
 ieeefloat(::Type{Int32}) = Float32
 ieeefloat(::Type{Int16}) = Float16
 ieeefloat(::Type{Int8}) = Float8
+
+ieeefloat(x::Int128) = reinterpret(Float128, x)
+ieeefloat(x::Int64) = reinterpret(Float64, x)
+ieeefloat(x::Int32) = reinterpret(Float32, x)
+ieeefloat(x::Int16) = reinterpret(Float16, x)
+ieeefloat(x::Int8) = reinterpret(Float8, x)
