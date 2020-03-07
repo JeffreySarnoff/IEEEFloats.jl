@@ -37,7 +37,7 @@ exponent_biasing(::Type{T}, unbiased) where T = unbiased + exponent_bias(T)
 exponent_unbiasing(::Type{T}, biased) where T = biased - exponent_bias(T)
 
 
-include("use_fields.jl") # _field_mask, _field_filter, _field_offset, _field, set__field!
+include("use_fields.jl") # get_x_field, set_x_field, isolate_x_field, clear_x_field
 
 
 
