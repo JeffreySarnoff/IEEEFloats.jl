@@ -6,7 +6,6 @@ isolate_exponent_field(x::T) where T = unsigned(x) & exponent_mask(T)
 isolate_significand_field(x::T) where T = unsigned(x) & significand_mask(T)
 isolate_sign_exponent_field(x::T) where T = unsigned(x) & sign_exponent_mask(T)
 isolate_exponent_significand_field(x::T) where T = unsigned(x) & sign_filter(T)
-isolate_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
 # clear the field in place
 # (yields the other fields, this field is zeroed)
@@ -16,7 +15,6 @@ clear_exponent_field(x::T) where T = unsigned(x) & exponent_filter(T)
 clear_significand_field(x::T) where T = unsigned(x) & significand_filter(T)
 clear_sign_exponent_field(x::T) where T = unsigned(x) & sign_exponent_filter(T)
 clear_exponent_significand_field(x::T) where T = unsigned(x) & exponent_significand_filter(T)
-clear_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
 # fetch the field into the low order bits
 # all other bits are zeroed
@@ -67,4 +65,3 @@ sign_exponent_mask_lsbs(::Type{T}) where T = sign_exponent_mask(T) >> exponent_o
 exponent_mask_lsbs(::Type{T}) where T = exponent_mask(T) >> exponent_offset(T)
 significand_mask_lsbs(::Type{T}) where T = significand_mask(T) >> significand_offset(T)
 exponent_significand_mask_lsbs(::Type{T}) where T = exponent_significand_mask(T) >> significand_offset(T)
-
