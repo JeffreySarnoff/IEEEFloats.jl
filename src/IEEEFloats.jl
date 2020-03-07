@@ -14,6 +14,8 @@ using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_m
 
 # `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
 
+sign_bits(::Type{T}) where T<:IEEEFloat = 1
+
 include("support_more_types.jl")  # Float128, Float8
 include("corresponding_sizes.jl") # ieeefloat(xT), unsigned(xT), signed(xT)
 
