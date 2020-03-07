@@ -49,8 +49,8 @@ exponent_significand_offset(::Type{T}) where T = significand_offset(T)
 sign_filter(::Type{T}) where T = ~zero(unsigned(T)) >>> 1
 exponent_filter(::Type{T}) where T = sign_exponent_filter(T) | sign_mask(T)
 significand_filter(::Type{T}) where T = ~sign_exponent_filter(T)
-sign_exponent_filter(::Type{T}) where T = ~(zero(unsigned(T)) >>> (exponent_bits(T) + 1)
-exponent_significand_filter(::Type{T}) where T = ~(sign_filter(T))
+sign_exponent_filter(::Type{T}) where T = ~zero(unsigned(T)) >>> (exponent_bits(T) + 1)
+exponent_significand_filter(::Type{T}) where T = ~sign_filter(T)
 
 # field masks
 
