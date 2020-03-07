@@ -53,10 +53,8 @@ sign_exponent_filter(::Type{T}) where T = ~zero(unsigned(T)) >>> (exponent_bits(
 exponent_significand_filter(::Type{T}) where T = ~sign_filter(T)
 
 # field masks
-
+# exponent_mask, significand_mask exist in Base
 sign_mask(::Type{T}) where T = ~sign_filter(T)
-exponent_mask(::Type{T}) where T = ~exponent_filter(T)
-significand_mask(::Type{T}) where T = ~sign_exponent_mask(T)
 sign_exponent_mask(::Type{T}) where T = ~sign_exponent_filter(T)
 exponent_significand_mask(::Type{T}) where T = ~exponent_significand_mask(T)
 
