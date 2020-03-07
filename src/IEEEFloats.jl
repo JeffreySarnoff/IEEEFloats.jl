@@ -1,13 +1,19 @@
 module IEEEFloats
 
 export IEEEFloat, ieeefloat,
+
        sign_mask, significand_mask, exponent_mask,
        sign_bits, significand_bits, exponent_bits,
+
        exponent_bias, exponent_biasing, exponent_unbiasing,
        unbiased_exponent_max, unbiased_exponent_min,
        biased_exponent_max, biased_exponent_min,
+
        get_sign, get_exponent, get_signficand,
-       set_sign, set_exponent, set_signficand
+       set_sign, set_exponent, set_signficand,
+       isolate_sign, isolate_exponent, isolate_significand,
+       clear_sign, clear_exponent, clear_significand
+
  
 using Base: IEEEFloat, precision, significand_mask, exponent_mask
 
