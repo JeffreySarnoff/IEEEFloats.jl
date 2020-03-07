@@ -1,3 +1,32 @@
+const FloatBits = NamedTuple{(:all, :sign, :exponent, :significand),T} where T
+
+"""
+     StandardFloat
+
+A `StandardFloat` is a floating point type that respects IEEE754-2019.
+
+This registers the type so it is available for use with pkg functions.
+"""
+struct StandardFloat{T,R} # item Type, is Registered
+    name::Symbol
+    type::Union{Nothing, T}
+    bits::FloatBits
+end
+
+function StandardFloat(type::T, name::Symbol, bits::FloatBits) where T
+    if isdefined(Base, :exponent_bits)
+        Base.exponent_bits(::Type{T)} = bits.exponent
+        Base.significand_bits(::Type{T}) = bits.significand
+    else
+        exponent_bits(::Type{T)} = bits.exponent
+        significand_bits(::Type{T}) = bits.significand
+    end
+    sign_bits(::Type{T}) = bits.sign
+end
+            
+function register_ieeefloat(stdfloat::StandardFloat{T,R}) where {T,R}
+end
+
 """
     Float128
 
