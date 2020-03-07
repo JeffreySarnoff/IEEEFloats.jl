@@ -1,17 +1,20 @@
 module IEEEFloats
 
-export ieeefloat, bitwidth, 
-       signbit, sign, precision, exponent, significand,
+export IEEEFloat, ieeefloat,
+       sign_mask, significand_mask, exponent_mask,
+       significand_bits, exponent_bits,
+       exponent_bias, exponent_biasing, exponent_unbiasing,
+       unbiased_exponent_max, unbiased_exponent_min, biased_exponent_max, biased_exponent_min,
+
+
        exponentmax, exponentmin, exponentfieldmax,
-       intfloatmax, intfloatmin, floatintmax, floatintmin,
        get_sign_field, get_exponent_field, get_signficand_field,
        get_sign_and_exponent_fields, get_exponent_and_significand_fields,
        set_sign_field, set_exponent_field, set_signficand_field,
-       set_sign_and_exponent_fields, set_exponent_and_significand_fields,
-       IEEEFloat, ieeefloat
-
-using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask,
-            signed, unsigned
+       set_sign_and_exponent_fields, set_exponent_and_significand_fields
+ 
+using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
+# Base: signed, unsigned, maxintfloat
 
 # `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
 
@@ -38,17 +41,6 @@ include("use_fields.jl") # _field_mask, _field_filter, _field_offset, _field, se
 
 
 
-# set field[s]: set_sign_field(1.0, 1%UInt64) == -1.0
-
-for (S,F) in ((:set_sign_field, :filter_sign_field), (:set_exponent_field, :filter_exponent_field),
-              (:set_significand_field, :filter_exponent_field), (:set_sign_and_exponent_fields, :filter_sign_and_exponent_fields),
-              (:set_exponent_and_significand_fields, :filter_exponent_and_significand_fields))
-  for (T,U) in ((:Float64, :UInt64), (:Float32, :UInt32), (:Float16, :UInt16))
-    @eval begin
-        @inline $S(x::$T, y::$U) = convert($T, $F(convert($U, x)) | $S(y))
-    end
-  end
-end
 
 # ============== #
 
