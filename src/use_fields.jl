@@ -49,15 +49,7 @@ clear_sign_exponent_field(x::T) where T = unsigned(x) & sign_exponent_filter(T)
 clear_exponent_significand_field(x::T) where T = unsigned(x) & exponent_significand_filter(T)
 clear_sign_significand_field(x::T) where T = unsigned(x) & exponent_mask(T)
 
-# fetch the field[s] into the low order bits of an Unsigned
-
-get_sign_field(x::T) where T<:Unsigned = sign_field(x) >> sign_offset(T)
-get_exponent_field(x::T) where T<:Unsigned = exponent_field(x) >> exponent_offset(T)
-get_significand_field(x::T) where T<:Unsigned = significand_field(x) >> significand_offset(T)
-get_sign_exponent_field(x::T) where T<:Unsigned = sign_exponent_field(x) >> exponent_offset(T)
-get_exponent_significand_field(x::T) where T<:Unsigned = exponent_significand_field(x) >> significand_offset(T)
-
-# fetch the field[s] into the low order bits of a Float
+# fetch the field into the low order bits
 
 get_sign_field(x::T) where T = isolate_sign_field(x) >> sign_offset(T)
 get_exponent_field(x::T) where T = isolate_exponent_field(x) >> exponent_offset(T)
