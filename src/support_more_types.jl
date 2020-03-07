@@ -16,10 +16,15 @@ This placeholder is used to reference related constants.
 This placeholder is used to reference related constants.
 """ Binary8
 
-struct Float128 <: AbstractFloat end
-struct Float8   <: AbstractFloat end
-struct Binary8  <: AbstractFloat end
-
+if !isdefined(:Float128)
+    primitive type Float128 <: AbstractFloat 128 end
+end
+if !isdefined(:Float128)
+    primitive type Float8   <: AbstractFloat 8 end
+end
+if !isdefined(:Binary8)
+    primitive type Binary8  <: AbstractFloat 8 end
+end
 
 sign_bits(::Type{Float128}) = 1
 sign_filter(::Type{Float128}) = ~zero(UInt128) >> 1
