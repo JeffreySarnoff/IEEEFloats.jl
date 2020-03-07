@@ -4,14 +4,10 @@ export IEEEFloat, ieeefloat,
        sign_mask, significand_mask, exponent_mask,
        significand_bits, exponent_bits,
        exponent_bias, exponent_biasing, exponent_unbiasing,
-       unbiased_exponent_max, unbiased_exponent_min, biased_exponent_max, biased_exponent_min,
-
-
-       exponentmax, exponentmin, exponentfieldmax,
-       get_sign_field, get_exponent_field, get_signficand_field,
-       get_sign_and_exponent_fields, get_exponent_and_significand_fields,
-       set_sign_field, set_exponent_field, set_signficand_field,
-       set_sign_and_exponent_fields, set_exponent_and_significand_fields
+       unbiased_exponent_max, unbiased_exponent_min,
+       biased_exponent_max, biased_exponent_min,
+       get_sign, get_exponent, get_signficand,
+       set_sign, set_exponent, set_signficand,
  
 using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
 # Base: signed, unsigned, maxintfloat
