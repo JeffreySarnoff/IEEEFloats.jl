@@ -1,4 +1,18 @@
-### IEEE754-2019 conformant constants for Float8, Float16, Float32, Float64, Float128
+# IEEEFloats.jl
+### IEEE754-2019 structural introspection for Float8, Float16, Float32, Float64, Float128
+
+
+
+#### Copyright © 2015-2020 by Jeffrey Sarnoff. This work is released under The MIT License.
+
+----
+
+[![Build Status](https://travis-ci.org/JeffreySarnoff/IEEEFloats.jl.svg?branch=master)](https://travis-ci.org/JeffreySarnoff/IEEEFloats.jl)&nbsp;&nbsp;&nbsp;[![codecov](https://codecov.io/gh/JeffreySarnoff/IEEEFloats.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JeffreySarnoff/IEEEFloats.jl)
+
+----
+
+
+
 
 ```julia
 
