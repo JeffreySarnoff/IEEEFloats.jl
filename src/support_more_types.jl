@@ -70,4 +70,4 @@ exponent_filter(::Type{Float128}) = ~exponent_mask(Float128)
 exponent_filter(::Type{Float8}) = ~exponent_mask(Float8)
 
 significand_filter(::Type{Float128}) = ~significand_mask(Float128)
-significand_filter(::Type{Float128}) = ~significand_mask(Float8)
+significand_filter(::Type{Float8}) = ~significand_mask(Float8)
