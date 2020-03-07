@@ -12,6 +12,14 @@ export IEEEFloat, ieeefloat,
 using Base: IEEEFloat, precision, significand_bits, exponent_bits, significand_mask, exponent_mask
 # Base: signed, unsigned, maxintfloat
 
+if isdefined(Base, :significand_bits)
+    using Base: significand_bits
+else
+    significand_bits(Type{Float64}) = 52
+    significand_bits(Type{Float32}) = 23
+    significand_bits(Type{Float16}) = 10
+ end       
+
 # `f(xT)` denotes a function `f` that accepts either a value `x::T` or a type `T
 
 sign_bits(::Type{T}) where T<:IEEEFloat = 1
