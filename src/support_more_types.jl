@@ -13,6 +13,7 @@ struct StandardFloat{F} # item Type, is Registered
 end
 
 function StandardFloat(::Type{T}, bits::FloatBits) where T
+   bitsof(T) == sum(bits)-bits.all || throw(DomainError(T, "sum(bits) != bitsof(T)")       
    @eval begin
     if isdefined(Base, :exponent_bits)
         Base.exponent_bits(::Type{$T}) = $bits.exponent
